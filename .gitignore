@@ -1,0 +1,177 @@
+# =========================
+# Global / workspace noise
+# =========================
+
+# Operating system files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Editor / IDE files
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+*.swp
+*.swo
+*~
+
+# Backups / temporary files
+*.bak
+*.backup
+*.old
+*.orig
+*.tmp
+*.temp
+*.rej
+*.diff
+*.patch
+draft/
+WIP/
+
+# Logs / diagnostics
+*.log
+*.log.*
+logs/
+log/
+crash-reports/
+debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Caches / tool state
+.cache/
+.eslintcache
+.parcel-cache/
+.turbo/
+.vite/
+.stylelintcache
+.sass-cache/
+.nyc_output/
+coverage/
+
+# Auto-generated upgrade hook telemetry
+.github/java-upgrade/
+
+# Environment / secrets
+.env
+.env.*
+*.env
+*.env.*
+*.local
+*.secret
+*.secrets
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Archives / packaged artifacts
+*.7z
+*.gz
+*.rar
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.xz
+*.bz2
+
+# ==================================
+# Java / Gradle / Maven / Minecraft
+# ==================================
+
+.gradle/
+build/
+dist/
+out/
+target/
+bin/
+classes/
+generated/
+generated-sources/
+generated-resources/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.lck
+dependency-reduced-pom.xml
+
+# Minecraft / datapack / plugin / mod dev environments
+run/
+runs/
+run-*/
+.run/
+.minecraft/
+server/
+client/
+world/
+saves/
+testworld/
+testworlds/
+screenshots/
+hs_err_pid*
+replay_pid*
+
+# Common mod-loader specific folders
+.fabric/
+.forge/
+.neoforge/
+.mixin.out/
+.mcp/
+.architectury/
+
+# Common packaged outputs from mod/plugin tooling
+remappedSrc/
+remappedClasses/
+fabric-out/
+forge-out/
+neoforge-out/
+
+# ==================================
+# Python / Node / other tooling
+# ==================================
+
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+env/
+ENV/
+node_modules/
+
+# ==================================
+# Optional local-only project files
+# ==================================
+
+*.pid
+*.seed
+*.sqlite
+*.sqlite3
+*.db
+*.mdb
+*.sublime-workspace
+*.sublime-project
+
+# =========================
+# Documentation / media / assets
+# =========================
+
+Docs/*
+!README.*.md
+!CHANGELOG.*.md
