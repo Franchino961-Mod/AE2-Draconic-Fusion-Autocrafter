@@ -37,6 +37,8 @@ Desktop.ini
 *.patch
 draft/
 WIP/
+scratch/
+.tools/
 
 # Logs / diagnostics
 *.log
