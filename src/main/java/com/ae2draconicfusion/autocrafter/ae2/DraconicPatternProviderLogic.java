@@ -13,10 +13,12 @@ import com.ae2draconicfusion.autocrafter.fusion.FusionStructureScanner;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class DraconicPatternProviderLogic extends PatternProviderLogic {
     private static final int DEFAULT_SCAN_RANGE = 8;
@@ -40,61 +42,65 @@ public final class DraconicPatternProviderLogic extends PatternProviderLogic {
         BlockPos providerPos = hostBlockEntity.getBlockPos();
         BlockPos corePos = FusionBusAccess.resolveFusionCoreInRange(serverLevel, providerPos, DEFAULT_SCAN_RANGE).orElse(null);
         if (corePos == null) {
-            LOGGER.debug("pushPattern aborted at {}: no fusion core within range {}.", providerPos, DEFAULT_SCAN_RANGE);
             return false;
         }
 
-        LOGGER.debug("pushPattern invoked at {} for pattern {}.", providerPos, pattern.getDefinition());
+        // 1. Scan the structure. If it's busy, abort the whole push immediately.
+        // This prevents items from being stuck half-way in.
+        var snapshot = routingService.getStructureScanner().scan(serverLevel, corePos, DEFAULT_SCAN_RANGE);
+        if (!snapshot.validCore() || routingService.isCoreCrafting(snapshot.core())) {
+            return false;
+        }
 
-        // B004: pre-resolve catalyst once from the recipe registry BEFORE the item loop.
-        // This breaks the chicken-and-egg dependency where getActiveRecipe() is null until items are placed.
-        @Nullable Ingredient preResolvedCatalyst = resolvePatternCatalyst(serverLevel, pattern);
-        LOGGER.debug("Pre-resolved catalyst for pattern {}: {}", pattern.getDefinition(),
-            preResolvedCatalyst != null ? "found" : "not found");
+        LOGGER.debug("pushPattern starting atomic delivery at {} for pattern {}.", providerPos, pattern.getDefinition());
 
-        boolean routedAny = false;
-        // B002: track temporary failures separately so we don't abort the whole push on the first TEMPORARY_FAILURE
-        boolean hadTemporaryFailure = false;
+        // 2. Pre-resolve catalyst info (ingredient + count)
+        @Nullable FusionRoutingService.CatalystInfo catalystInfo = resolvePatternCatalyst(serverLevel, pattern);
 
+        // 3. Prepare the list of items to route
+        List<ItemStack> stacksToRoute = new ArrayList<>();
         if (inputs != null) {
             for (KeyCounter counter : inputs) {
-                if (counter == null || counter.isEmpty()) {
-                    continue;
-                }
-
                 for (var entry : counter) {
-                    AEKey key = entry.getKey();
-                    long amount = entry.getLongValue();
-                    if (!(key instanceof AEItemKey itemKey) || amount <= 0) {
-                        continue;
-                    }
-
-                    ItemStack stack = itemKey.toStack((int) Math.min(amount, itemKey.getMaxStackSize()));
-                    FusionRoutingResult result = routingService.routeItemStackToFusionStructure(
-                        serverLevel, corePos, stack, DEFAULT_SCAN_RANGE, false, preResolvedCatalyst);
-                    LOGGER.debug("Routed {} x{} -> {}", stack.getItem(), stack.getCount(), result);
-
-                    if (result == FusionRoutingResult.SUCCESS) {
-                        routedAny = true;
-                    } else if (result == FusionRoutingResult.TEMPORARY_FAILURE
-                            || result == FusionRoutingResult.TARGET_SLOTS_OCCUPIED) {
-                        // B002/second-push fix: temporary unavailability (core busy, slots momentarily full
-                        // post-craft, or catalyst already placed) — continue with remaining items and retry later.
-                        hadTemporaryFailure = true;
-                    } else {
-                        // Structural failure: INVALID_CORE, NO_INJECTORS_FOUND, INJECTORS_INSUFFICIENT
-                        LOGGER.debug("pushPattern: structural failure {} for {} at {}; aborting push.",
-                            result, stack.getItem(), providerPos);
-                        return false;
+                    if (entry.getKey() instanceof AEItemKey itemKey && entry.getLongValue() > 0) {
+                        stacksToRoute.add(itemKey.toStack((int) entry.getLongValue()));
                     }
                 }
             }
         }
 
-        // Return true only if at least one item was routed and no temporary failures remain unresolved.
-        // If hadTemporaryFailure && !routedAny: return false so AE2 reschedules the push.
-        // If hadTemporaryFailure && routedAny: return true (partial success; AE2 will push remaining next tick).
-        return routedAny;
+        if (stacksToRoute.isEmpty()) {
+            return false;
+        }
+
+        // 4. SIMULATION: Verify that ALL items would fit
+        // We use a simulation pass to ensure we don't start putting items if we can't finish.
+        for (ItemStack stack : stacksToRoute) {
+            FusionRoutingResult simResult = routingService.routeItemStackToFusionStructure(
+                serverLevel, corePos, stack, DEFAULT_SCAN_RANGE, true, catalystInfo);
+            if (simResult != FusionRoutingResult.SUCCESS) {
+                LOGGER.debug("pushPattern atomic delivery simulated failure: {} for item {}.", simResult, stack);
+                return false;
+            }
+        }
+
+        // 5. MODULATION: Actually place the items
+        for (ItemStack stack : stacksToRoute) {
+            FusionRoutingResult realResult = routingService.routeItemStackToFusionStructure(
+                serverLevel, corePos, stack, DEFAULT_SCAN_RANGE, false, catalystInfo);
+            if (realResult != FusionRoutingResult.SUCCESS) {
+                // This should not happen if simulation passed, unless the world changed in the same tick.
+                LOGGER.error("[AE2DraconicFusion] Atomic delivery failed at modulation phase! State might be inconsistent.");
+                return true; // Return true because some items WERE consumed
+            }
+            LOGGER.info("[AE2DraconicFusion] Atomic Route: {} -> SUCCESS", stack.getItem());
+        }
+
+
+        // 6. AUTO-START: All items are in, trigger the craft!
+        routingService.triggerStartCraft(snapshot.core());
+
+        return true;
     }
 
     /**
@@ -102,7 +108,7 @@ public final class DraconicPatternProviderLogic extends PatternProviderLogic {
      * that matches the pattern's expected output. Called once per pushPattern invocation.
      */
     @Nullable
-    private Ingredient resolvePatternCatalyst(ServerLevel level, IPatternDetails pattern) {
+    private FusionRoutingService.CatalystInfo resolvePatternCatalyst(ServerLevel level, IPatternDetails pattern) {
         try {
             GenericStack primaryOutput = pattern.getPrimaryOutput();
             if (primaryOutput == null) return null;
