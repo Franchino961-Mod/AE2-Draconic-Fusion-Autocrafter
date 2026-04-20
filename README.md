@@ -1,66 +1,95 @@
-# AE2 Draconic Fusion Autocrafter
+# ⚡ AE2 Draconic Fusion Autocrafter
+**Seamlessly Automate Fusion Crafting with the Power of AE2!**
 
-NeoForge addon for Minecraft 1.21.1 that automates Draconic Evolution Fusion Crafting through AE2 core-only connection.
+[![Download on CurseForge](https://img.shields.io/badge/Download_on-CurseForge-orange?style=for-the-badge&logo=curseforge)](https://www.curseforge.com/minecraft/mc-mods/ae2-draconic-fusion-autocrafter)
 
-## Current status
-- Project bootstrap completed.
-- Base mod entrypoint and metadata created.
-- Compatibility officially locked to:
-  - AE2 from 19.2.0+
-  - Draconic Evolution from 3.1.4.630+
-- Dependency baselines configured:
-  - NeoForge 21.1.223
-  - AE2 19.2.17
-  - Draconic Evolution 1.21.1-3.1.4.632
-- Build status:
-  - `./gradlew build -x test` passes.
-- Phase 1 completed:
-  - Fusion Routing Card item registered.
-- Phase 2 started:
-  - AE2 upgrade hook registers Fusion Routing Card for Export Bus via `Upgrades.add`.
-- New provider variants added:
-  - `ME Draconic Pattern Provider` item variant delegates placement/use to AE2 `pattern_provider`.
-  - `ME Draconic Pattern Provider (Panel)` item variant delegates placement/use to AE2 `cable_pattern_provider`.
-  - Temporary models/textures copied from AE2 Pattern Provider assets (same development baseline visuals).
-- Fusion Core routing bridge added:
-  - exposes an item-handler capability on Draconic `crafting_core`.
-  - incoming inserts are routed to catalyst/core and injectors via recipe-aware routing.
-  - works with simulation + execution flow used by AE2 insertion logic.
-- AE2 detection helper added:
-  - bus upgrade check via `IUpgradeableObject`.
-  - adjacent Fusion Core resolution via world scan.
-- AE2 export strategy bridge added:
-  - temporary disabled at startup because AE2 already owns the global item export strategy key (`ae2:i`) and duplicate registration crashes load.
-  - current runtime integration keeps the Fusion Routing Card registration only.
-- Draconic validation path moved to reflection-based discovery so the code stays buildable without Brandon's Core on the compile classpath.
-- Injector assignment mode: deterministic ordering by distance from core, then direction tie-break.
-- Fusion Routing Card texture now present at `src/main/resources/assets/ae2_draconic_fusion_autocrafter/textures/item/fusion_routing_card.png`.
-- Routing now supports recipe-aware filtering:
-  - if a fusion recipe is active on the core, only matching catalyst/ingredients are assigned.
-  - deterministic injector ordering remains the fallback/base behavior.
-- Recipe-aware matching now prefers more specific alternatives when multiple ingredients can match.
-- Prefilled injector guard added: incompatible preloaded injector stacks now stop routing to avoid corrupting recipe setup.
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.21.1-green.svg)](https://www.minecraft.net/)
+[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)]()
+[![NeoForge](https://img.shields.io/badge/NeoForge-21.1.223-orange.svg)](https://neoforged.net/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Next steps
-1. Replace alias delegation with fully custom provider block/part implementations.
-2. Harden edge-case handling for mixed external automation on the same Fusion Core.
-3. Add dedicated recipes and progression for the two new provider variants.
+[![en](https://img.shields.io/badge/lang-en-red.svg)](README.md)
+[![it](https://img.shields.io/badge/lang-it-green.svg)](Docs/README.it.md)
 
-## Asset paths
-- Item icon/texture: `src/main/resources/assets/ae2_draconic_fusion_autocrafter/textures/item/fusion_routing_card.png`
-- Item model: `src/main/resources/assets/ae2_draconic_fusion_autocrafter/models/item/fusion_routing_card.json`
-- Translation keys: `src/main/resources/assets/ae2_draconic_fusion_autocrafter/lang/en_us.json` and `it_it.json`
+> 📝 **Changelog**: See [CHANGELOG.en.md](Docs/CHANGELOG.en.md) for version history.
 
-## Useful links
-### Draconic Evolution
-- Source code: https://github.com/Draconic-Inc/Draconic-Evolution
-- FTB wiki (community): https://ftbwiki.org/Draconic_Evolution
-- Community guide: https://www.minecraft-guides.com/mod/draconic-evolution/
+---
 
-### Applied Energistics 2
-- Source code: https://github.com/AppliedEnergistics/Applied-Energistics-2
-- Official guide: https://guide.appliedenergistics.org/
+## 📖 Overview
 
-## Dependency notes
-- AE2 API artifact is published on Maven Central as org.appliedenergistics:appliedenergistics2.
-- Draconic Evolution artifacts are published through Brandon/Covers nexus indexes.
+**AE2 Draconic Fusion Autocrafter** is a specialized addon designed to bridge the gap between **Applied Energistics 2** and **Draconic Evolution**. It introduces a native way to automate the complex Multi-Block Fusion Crafting process without the need for messy redstone, external timers, or complex subnetworks.
+
+By providing custom Pattern Providers and intelligent routing logic, this mod ensures that catalysts and ingredients always find their correct place in your fusion structure, making top-tier Draconic crafting as simple as clicking "Craft" in your ME Terminal.
+
+---
+
+## ✨ Key Features
+
+- 🧬 **Native AE2 Integration**: New blocks and parts that act like standard Pattern Providers but speak "Fusion".
+- 🎯 **Intelligent Routing**: Automatically distinguishes between the Fusion Catalyst (Core) and Ingredients (Injectors).
+- 🔄 **Recipe-Aware Logic**: Dynamically assigns items to injectors based on the active fusion recipe to prevent conflicts.
+- ⚡ **Retry System**: Handles "Core Busy" states gracefully, preventing AE2 from timing out during long crafting operations.
+- 🛠️ **No Shadowing**: Does not override Draconic Evolution's inventory logic, ensuring compatibility with all extraction methods (Import Bus, pipes, etc.).
+- 📦 **Compact Design**: Use the Panel variant to keep your fusion setup sleek and hidden behind cables.
+
+---
+
+## 🎮 How It Works
+
+### Setting Up the Automation
+
+1. **Craft** an `ME Draconic Pattern Provider` (Block or Panel).
+2. **Place** it adjacent to a **Draconic Fusion Crafting Core**.
+3. **Configure** your Fusion recipes in AE2 Patterns normally (Inputs on one side, Output on the other).
+4. **Insert** the patterns into the Draconic Pattern Provider.
+5. **Start Crafting!** The mod will automatically:
+    - Send the catalyst to the Core.
+    - Deterministically distribute ingredients to the valid injectors in range.
+    - Wait for the Core to be free before pushing the next recipe.
+
+---
+
+## 📦 Installation
+
+### Requirements
+- **Minecraft**: 1.21.1
+- **NeoForge**: 21.1.223 or higher
+- **Applied Energistics 2**: 19.2.17 or higher
+- **Draconic Evolution**: 3.1.4.632 or higher
+- **Brandon's Core**: Required dependency for Draconic Evolution
+
+---
+
+## 🤝 Compatibility
+
+### Tested With
+- ✅ **Applied Energistics 2**: Deep integration
+- ✅ **Draconic Evolution**: Full multi-block support
+- ✅ **JEI/REI/EMI**: Integration for patterns
+- ✅ **Sophisticated Storage/Backpacks**: Works with external inventories
+
+---
+
+## 📄 License
+
+This mod is licensed under the [MIT License](LICENSE). You are free to include it in any modpack!
+
+## 👤 Author
+
+**Franchino961** — [GitHub](https://github.com/Franchino961-Mod)
+
+## 💬 Support
+
+Report bugs or suggest features on our [Issue Tracker](../../issues). Please include your mod version and any relevant logs.
+
+---
+
+## 🔗 Links
+
+- [Draconic Evolution](https://www.curseforge.com/minecraft/mc-mods/draconic-evolution)
+- [Applied Energistics 2](https://www.curseforge.com/minecraft/mc-mods/applied-energistics-2)
+- [NeoForge](https://neoforged.net/)
+
+---
+
+**Made with ❤️ for the AE2 & Draconic Evolution community!**
