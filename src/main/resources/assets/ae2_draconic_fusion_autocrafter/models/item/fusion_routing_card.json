@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "ae2_draconic_fusion_autocrafter:item/fusion_routing_card"
+  }
+}
