@@ -1,0 +1,50 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'net.neoforged.moddev' version '2.0.74'
+}
+
+group = mod_group_id
+version = mod_version
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+neoForge {
+    version = neo_version
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
+
+    runs {
+        client {
+            client()
+            gameDirectory = file('runs/client')
+        }
+        server {
+            server()
+            gameDirectory = file('runs/server')
+        }
+    }
+}
+
+dependencies {
+    // AE2 API for addon integration + runtime for local development runs.
+    compileOnly "org.appliedenergistics:appliedenergistics2:${ae2_version}:api"
+    compileOnly "org.appliedenergistics:appliedenergistics2:${ae2_version}"
+    runtimeOnly "org.appliedenergistics:appliedenergistics2:${ae2_version}"
+
+    // Draconic Evolution integration surface + runtime for local development runs.
+    compileOnly "com.brandon3055.draconicevolution:Draconic-Evolution:${draconic_version}"
+    runtimeOnly "com.brandon3055.draconicevolution:Draconic-Evolution:${draconic_version}"
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
