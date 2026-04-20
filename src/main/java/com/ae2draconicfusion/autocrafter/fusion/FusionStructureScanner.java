@@ -32,14 +32,16 @@ public final class FusionStructureScanner {
 
         invokeNoArg(blockEntity, "updateInjectors");
 
-        Object fusionState = invokeNoArg(blockEntity, "getFusionState");
-        // Diagnostic INFO log: always visible so we can see the state after craft completion
-        LOGGER.info("[AE2DraconicFusion] Core at {} fusionState={} class={}",
-            corePos, fusionState, fusionState == null ? "null" : fusionState.getClass().getSimpleName());
+        Object isCraftingObj = invokeNoArg(blockEntity, "isCrafting");
+        boolean crafting = isCraftingObj instanceof Boolean b && b;
 
-        if (isBusyFusionState(fusionState)) {
-            // B001: core is busy (CRAFTING/CHARGING) but physically valid — use busy() which keeps validCore=true
-            LOGGER.debug("Scanner: core at {} is temporarily busy: {}", corePos, fusionState);
+        Object fusionState = invokeNoArg(blockEntity, "getFusionState");
+        // Diagnostic INFO log: visible to identify states like DONE, START, etc.
+        LOGGER.info("[AE2DraconicFusion] Core at {} is in state: {} (isCrafting={})", corePos, fusionState, crafting);
+
+        if (crafting) {
+            // Core is actively crafting/charging — use busy() which keeps validCore=true
+            // but blocks routing for this tick.
             return FusionStructureSnapshot.busy(corePos, blockEntity, fusionState);
         }
 
@@ -75,20 +77,6 @@ public final class FusionStructureScanner {
 
         LOGGER.debug("Scanner accepted core at {} with {} valid injectors", corePos, rawInjectors.size());
         return FusionStructureSnapshot.valid(corePos, blockEntity, new ArrayList<>(rawInjectors), fusionState);
-    }
-
-    private boolean isBusyFusionState(Object fusionState) {
-        if (fusionState == null) {
-            // If getFusionState() returned null (reflection failed or unknown), assume NOT busy.
-            return false;
-        }
-
-        String stateName = fusionState.toString().toUpperCase();
-
-        // Allowlist approach: only states we KNOW are idle/ready get a clear path.
-        // Everything else (CRAFTING, CHARGING, DONE, COMPLETE, WAITING, SETUP, etc.) is treated as busy
-        // so items are never placed during a transient post-craft state.
-        return !stateName.equals("IDLE") && !stateName.equals("INACTIVE") && !stateName.equals("START");
     }
 
     private Object invokeNoArg(Object target, String methodName) {
