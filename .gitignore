@@ -177,3 +177,4 @@ node_modules/
 Docs/*
 !README.*.md
 !CHANGELOG.*.md
+*.ps1
