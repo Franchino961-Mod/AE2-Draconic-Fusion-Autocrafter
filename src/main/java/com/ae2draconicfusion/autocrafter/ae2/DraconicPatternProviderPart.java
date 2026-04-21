@@ -79,4 +79,14 @@ public final class DraconicPatternProviderPart extends PatternProviderPart {
     public Component getCustomName() {
         return Component.translatable("gui.ae2_draconic_fusion_autocrafter.me_draconic_pattern_provider");
     }
+
+    @Override
+    public Component getName() {
+        return Component.translatable("block.ae2_draconic_fusion_autocrafter.me_draconic_pattern_provider");
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return getCustomName();
+    }
 }
