@@ -47,6 +47,8 @@ Grazie a Pattern Provider personalizzati e a una logica di routing intelligente,
     - Distribuirà gli ingredienti in modo deterministico agli injector validi nel raggio d'azione.
     - Aspetterà che il Core sia libero prima di inviare la ricetta successiva.
 
+![ME Draconic Pattern Provider setup](Docs/assets/images/ME_Draconic_Pattern_Provider.png)
+
 ---
 
 ## 📦 Installazione

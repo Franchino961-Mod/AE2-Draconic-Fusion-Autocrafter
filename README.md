@@ -47,6 +47,8 @@ By providing custom Pattern Providers and intelligent routing logic, this mod en
     - Deterministically distribute ingredients to the valid injectors in range.
     - Wait for the Core to be free before pushing the next recipe.
 
+![ME Draconic Pattern Provider setup](Docs/assets/images/ME_Draconic_Pattern_Provider.png)
+
 ---
 
 ## 📦 Installation
@@ -66,7 +68,6 @@ By providing custom Pattern Providers and intelligent routing logic, this mod en
 - ✅ **Applied Energistics 2**: Deep integration
 - ✅ **Draconic Evolution**: Full multi-block support
 - ✅ **JEI/REI/EMI**: Integration for patterns
-- ✅ **Sophisticated Storage/Backpacks**: Works with external inventories
 
 ---
 
