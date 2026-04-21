@@ -177,4 +177,7 @@ node_modules/
 Docs/*
 !README.*.md
 !CHANGELOG.*.md
+!Docs/assets/
+Docs/assets/*
+!Docs/assets/**
 *.ps1
