@@ -5,7 +5,7 @@ issueTrackerURL="https://github.com/Franchino961-Mod/AE2-Draconic-Fusion-Autocra
 
 [[mods]]
 modId="ae2_draconic_fusion_autocrafter"
-version="${file.jarVersion}"
+version="${mod_version}"
 displayName="AE2 Draconic Fusion Autocrafter"
 logoFile="assets/ae2_draconic_fusion_autocrafter/icon.png"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/ae2-draconic-fusion-autocrafter"
