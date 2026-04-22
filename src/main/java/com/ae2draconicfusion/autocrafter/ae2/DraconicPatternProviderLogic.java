@@ -20,6 +20,12 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Custom crafting logic for the ME Draconic Pattern Provider.
+ * Extends AE2's PatternProviderLogic to route pattern items into
+ * Draconic Evolution Fusion Crafting structures (Core + Injectors)
+ * using a two-phase approach: simulation first, then execution.
+ */
 public final class DraconicPatternProviderLogic extends PatternProviderLogic {
     private static final int DEFAULT_SCAN_RANGE = 8;
     private static final Logger LOGGER = LoggerFactory.getLogger(DraconicPatternProviderLogic.class);
@@ -84,18 +90,16 @@ public final class DraconicPatternProviderLogic extends PatternProviderLogic {
             }
         }
 
-        // 5. MODULATION: Actually place the items
+        // 5. EXECUTION: Actually place the items
         for (ItemStack stack : stacksToRoute) {
             FusionRoutingResult realResult = routingService.routeItemStackToFusionStructure(
                 serverLevel, corePos, stack, DEFAULT_SCAN_RANGE, false, catalystInfo);
             if (realResult != FusionRoutingResult.SUCCESS) {
-                // This should not happen if simulation passed, unless the world changed in the same tick.
-                LOGGER.error("[AE2DraconicFusion] Atomic delivery failed at modulation phase! State might be inconsistent.");
+                LOGGER.error("Atomic delivery failed at execution phase! State might be inconsistent.");
                 return true; // Return true because some items WERE consumed
             }
-            LOGGER.info("[AE2DraconicFusion] Atomic Route: {} -> SUCCESS", stack.getItem());
+            LOGGER.debug("Atomic route: {} -> SUCCESS", stack.getItem());
         }
-
 
         // 6. AUTO-START: All items are in, trigger the craft!
         routingService.triggerStartCraft(snapshot.core());
@@ -104,8 +108,9 @@ public final class DraconicPatternProviderLogic extends PatternProviderLogic {
     }
 
     /**
-     * B004: Resolves the catalyst ingredient for this pattern by looking up the fusion crafting recipe
-     * that matches the pattern's expected output. Called once per pushPattern invocation.
+     * Resolves the catalyst ingredient for this pattern by looking up the
+     * fusion crafting recipe that matches the pattern's expected output.
+     * Called once per pushPattern invocation.
      */
     @Nullable
     private FusionRoutingService.CatalystInfo resolvePatternCatalyst(ServerLevel level, IPatternDetails pattern) {
