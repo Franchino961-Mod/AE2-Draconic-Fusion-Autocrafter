@@ -9,6 +9,12 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Scans the world around a Fusion Crafting Core to build a snapshot
+ * of the structure (core state, connected injectors, validity).
+ * Uses reflection to interact with Draconic Evolution's TileEntities
+ * without a compile-time dependency on the DE API.
+ */
 public final class FusionStructureScanner {
     private static final Logger LOGGER = LoggerFactory.getLogger(FusionStructureScanner.class);
     private static final String FUSION_CORE_CLASS = "com.brandon3055.draconicevolution.blocks.tileentity.TileFusionCraftingCore";
@@ -36,12 +42,10 @@ public final class FusionStructureScanner {
         boolean crafting = isCraftingObj instanceof Boolean b && b;
 
         Object fusionState = invokeNoArg(blockEntity, "getFusionState");
-        // Diagnostic INFO log: visible to identify states like DONE, START, etc.
-        LOGGER.info("[AE2DraconicFusion] Core at {} is in state: {} (isCrafting={})", corePos, fusionState, crafting);
+        LOGGER.debug("Core at {} is in state: {} (isCrafting={})", corePos, fusionState, crafting);
 
         if (crafting) {
-            // Core is actively crafting/charging — use busy() which keeps validCore=true
-            // but blocks routing for this tick.
+            // Core is actively crafting/charging — structurally valid but temporarily busy
             return FusionStructureSnapshot.busy(corePos, blockEntity, fusionState);
         }
 
@@ -114,7 +118,8 @@ public final class FusionStructureScanner {
             return new FusionStructureSnapshot(false, false, corePos, null, List.of(), null);
         }
 
-        // B001 fix: busy core is structurally valid — validCore=true so callers can distinguish it from a missing core.
+        // Busy core is structurally valid — validCore=true so callers
+        // can distinguish it from a missing core.
         public static FusionStructureSnapshot busy(BlockPos corePos, Object core, Object fusionState) {
             return new FusionStructureSnapshot(true, true, corePos, core, List.of(), fusionState);
         }
