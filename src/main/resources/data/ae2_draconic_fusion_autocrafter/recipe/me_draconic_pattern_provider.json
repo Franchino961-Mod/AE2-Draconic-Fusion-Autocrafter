@@ -1,0 +1,50 @@
+{
+  "type": "draconicevolution:fusion_crafting",
+  "catalyst": {
+    "item": "ae2:pattern_provider"
+  },
+  "ingredients": [
+    {
+      "consume": true,
+      "ingredient": {
+        "item": "ae2:annihilation_core"
+      }
+    },
+    {
+      "consume": true,
+      "ingredient": {
+        "item": "ae2:annihilation_core"
+      }
+    },
+    {
+      "consume": true,
+      "ingredient": {
+        "item": "ae2:formation_core"
+      }
+    },
+    {
+      "consume": true,
+      "ingredient": {
+        "item": "ae2:formation_core"
+      }
+    },
+    {
+      "consume": true,
+      "ingredient": {
+        "item": "draconicevolution:draconium_ingot"
+      }
+    },
+    {
+      "consume": true,
+      "ingredient": {
+        "item": "draconicevolution:draconium_ingot"
+      }
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "ae2_draconic_fusion_autocrafter:me_draconic_pattern_provider"
+  },
+  "techLevel": "draconium",
+  "totalEnergy": 128000
+}
