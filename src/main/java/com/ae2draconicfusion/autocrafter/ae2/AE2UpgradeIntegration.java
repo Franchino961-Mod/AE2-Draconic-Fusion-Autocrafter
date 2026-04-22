@@ -9,6 +9,11 @@ import net.minecraft.world.item.Items;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Registers the Fusion Routing Card as an AE2 upgrade card
+ * compatible with the Export Bus. Registration is idempotent
+ * and safe to call multiple times.
+ */
 public final class AE2UpgradeIntegration {
     private static final Logger LOGGER = LoggerFactory.getLogger(AE2UpgradeIntegration.class);
     private static final ResourceLocation AE2_EXPORT_BUS_ID = ResourceLocation.fromNamespaceAndPath("ae2", "export_bus");
