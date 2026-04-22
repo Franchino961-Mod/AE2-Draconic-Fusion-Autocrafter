@@ -12,6 +12,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
+/**
+ * BlockEntity for the ME Draconic Pattern Provider.
+ * Overrides the standard AE2 PatternProviderBlockEntity to use
+ * {@link DraconicPatternProviderLogic} and display the correct
+ * custom name and icon in the ME network.
+ */
 public final class DraconicPatternProviderBlockEntity extends PatternProviderBlockEntity {
     public DraconicPatternProviderBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
         super(blockEntityType, pos, state);
