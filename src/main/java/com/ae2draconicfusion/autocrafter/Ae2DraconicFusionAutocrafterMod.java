@@ -14,6 +14,11 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Main entry point for the AE2 Draconic Fusion Autocrafter mod.
+ * Registers all blocks, items, creative tabs, and AE2 integrations
+ * during mod loading on NeoForge.
+ */
 @Mod(Ae2DraconicFusionAutocrafterMod.MOD_ID)
 public final class Ae2DraconicFusionAutocrafterMod {
     public static final String MOD_ID = "ae2_draconic_fusion_autocrafter";
