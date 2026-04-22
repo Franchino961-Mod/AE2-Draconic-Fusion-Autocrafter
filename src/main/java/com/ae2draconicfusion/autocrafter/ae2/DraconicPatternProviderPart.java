@@ -13,6 +13,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
+/**
+ * Cable-attached (panel) variant of the ME Draconic Pattern Provider.
+ * Extends AE2's PatternProviderPart with custom logic, icons,
+ * and display names for the Draconic Fusion integration.
+ */
 public final class DraconicPatternProviderPart extends PatternProviderPart {
     private static final ResourceLocation MODEL_BASE = ResourceLocation.fromNamespaceAndPath(
             Ae2DraconicFusionAutocrafterMod.MOD_ID, "part/pattern_provider_base");
