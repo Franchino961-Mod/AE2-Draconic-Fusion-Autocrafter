@@ -38,7 +38,7 @@ By providing custom Pattern Providers and intelligent routing logic, this mod en
 
 ### Setting Up the Automation
 
-1. **Craft** an `ME Draconic Pattern Provider` (Block or Panel).
+1. **Craft** an `ME Draconic Pattern Provider` (Block or Panel). ![Crafting Recipe](Docs/assets/images/ME_Draconic_Pattern_Provider-Recipe_Small.png)
 2. **Place** it adjacent to a **Draconic Fusion Crafting Core**.
 3. **Configure** your Fusion recipes in AE2 Patterns normally (Inputs on one side, Output on the other).
 4. **Insert** the patterns into the Draconic Pattern Provider.
