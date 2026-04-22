@@ -17,9 +17,16 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Core routing engine that distributes items from AE2 patterns into
+ * Draconic Evolution Fusion Crafting structures.
+ * Handles catalyst placement, injector assignment, recipe matching,
+ * deterministic ordering, simulation, and rollback.
+ */
 public final class FusionRoutingService {
     private static final Logger LOGGER = LoggerFactory.getLogger(FusionRoutingService.class);
 
+    /** Pre-resolved catalyst info: the ingredient that goes into the core and its stack count. */
     public record CatalystInfo(Ingredient ingredient, int count) {
     }
 
@@ -58,8 +65,7 @@ public final class FusionRoutingService {
                 corePos, snapshot.validCore(), snapshot.coreBusy(), snapshot.injectors().size(),
                 snapshot.fusionState());
 
-        // B001: a busy core is valid but temporarily unavailable — return
-        // TEMPORARY_FAILURE, not INVALID_CORE
+        // A busy core is valid but temporarily unavailable
         if (snapshot.coreBusy()) {
             LOGGER.debug("Routing deferred for core {}: core is busy ({})", corePos, snapshot.fusionState());
             return FusionRoutingResult.TEMPORARY_FAILURE;
@@ -75,7 +81,7 @@ public final class FusionRoutingService {
         LOGGER.debug("Deterministic injector order resolved for core {} with {} injectors.", snapshot.corePos(),
                 orderedInjectors.size());
 
-        // B004: pass pre-resolved catalyst ingredient
+        // Pass pre-resolved catalyst ingredient for accurate routing
         Ingredient catalystIngredient = catalystInfo != null ? catalystInfo.ingredient() : null;
         RecipeRoutingContext recipeContext = buildRecipeRoutingContext(snapshot.core(), orderedInjectors,
                 catalystIngredient);
@@ -88,7 +94,7 @@ public final class FusionRoutingService {
 
         ItemStack remainingStack = sourceStack.copy();
 
-        // B004 fix: catalyst routing is independent of recipeAware — it works whenever
+        // Catalyst routing is independent of recipeAware — it works whenever
         // catalystIngredient is known
         if (recipeContext.catalystIngredient() != null && recipeContext.catalystIngredient().test(sourceStack)) {
             if (!recipeContext.currentCatalyst().isEmpty()) {
@@ -113,13 +119,13 @@ public final class FusionRoutingService {
             catalystStack.setCount(toTake);
             if (simulate || invokeSetCatalyst(snapshot.core(), catalystStack)) {
                 remainingStack.shrink(toTake);
-                LOGGER.info("[AE2DraconicFusion] Routed catalyst {} x{} directly into core {}.",
+                LOGGER.debug("Routed catalyst {} x{} into core {}.",
                         catalystStack.getItem(), toTake, snapshot.corePos());
                 if (remainingStack.isEmpty()) {
                     return FusionRoutingResult.SUCCESS;
                 }
             } else {
-                LOGGER.info("[AE2DraconicFusion] Failed to set catalyst {} on core {}.", catalystStack,
+                LOGGER.debug("Failed to set catalyst {} on core {}.", catalystStack,
                         snapshot.corePos());
                 return FusionRoutingResult.TEMPORARY_FAILURE;
             }
@@ -155,12 +161,12 @@ public final class FusionRoutingService {
             if (simulate || invokeSetStack(injector, singleItem)) {
                 remainingStack.shrink(1);
                 placedSomething = true;
-                LOGGER.info("[AE2DraconicFusion] Assigned {} to injector {}. Remaining count: {}", singleItem,
+                LOGGER.debug("Assigned {} to injector {}. Remaining count: {}", singleItem,
                         resolveInjectorPos(injector), remainingStack.getCount());
             } else {
                 recipeContext.restoreRemainingState();
                 rollbackInjectors(orderedInjectors, originalStacks);
-                LOGGER.info("[AE2DraconicFusion] Injector assignment failed at {}. Rollback executed.",
+                LOGGER.debug("Injector assignment failed at {}. Rollback executed.",
                         resolveInjectorPos(injector));
                 return FusionRoutingResult.TEMPORARY_FAILURE;
             }
@@ -190,11 +196,10 @@ public final class FusionRoutingService {
     }
 
     /**
-     * B004: Pre-resolves the catalyst ingredient for a given pattern output by
-     * scanning all registered
-     * fusion crafting recipes in the recipe manager BEFORE any items are placed.
-     * This breaks the chicken-and-egg dependency on {getActiveRecipe()} being
-     * non-null.
+     * Pre-resolves the catalyst ingredient for a given pattern output by
+     * scanning all registered fusion crafting recipes in the recipe manager
+     * BEFORE any items are placed. This breaks the chicken-and-egg
+     * dependency on {@code getActiveRecipe()} being non-null.
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public @Nullable CatalystInfo resolveCatalystForOutput(ServerLevel level, ItemStack patternOutput) {
@@ -278,9 +283,9 @@ public final class FusionRoutingService {
             return;
         try {
             core.getClass().getMethod("startCraft").invoke(core);
-            LOGGER.info("[AE2DraconicFusion] Crafting started automatically on core.");
+            LOGGER.debug("Crafting started automatically on core.");
         } catch (ReflectiveOperationException e) {
-            LOGGER.error("[AE2DraconicFusion] CRITICAL: Failed to call startCraft on core via reflection: {}",
+            LOGGER.error("Failed to call startCraft on core via reflection: {}",
                     e.getMessage());
         }
     }
@@ -335,7 +340,7 @@ public final class FusionRoutingService {
         Object recipeHolder = invokeNoArg(core, "getActiveRecipe");
         if (recipeHolder == null) {
             ItemStack currentCatalyst = getCurrentCatalyst(core);
-            // B004: if we pre-resolved the catalyst from the recipe registry, use it even
+            // If we pre-resolved the catalyst from the recipe registry, use it even
             // without an active recipe
             if (preResolvedCatalyst != null) {
                 return RecipeRoutingContext.disabledWithKnownCatalyst(preResolvedCatalyst, currentCatalyst);
@@ -386,7 +391,7 @@ public final class FusionRoutingService {
             return null;
         }
 
-        // B004: try all known method names across DE versions
+        // Try all known method names across DE versions to find the catalyst
         String[] methodCandidates = new String[] {
                 "getCatalyst", "catalyst", "getCatalystIngredient", "catalystIngredient",
                 "getCatalystItem", "catalystItem", "getTier", "getRequiredCore"
@@ -506,7 +511,7 @@ public final class FusionRoutingService {
             target.getClass().getMethod("setInjectorStack", ItemStack.class).invoke(target, stack);
             return true;
         } catch (ReflectiveOperationException exception) {
-            LOGGER.error("[AE2DraconicFusion] CRITICAL: Failed to call setInjectorStack on {} via reflection: {}",
+            LOGGER.error("Failed to call setInjectorStack on {} via reflection: {}",
                     target, exception.getMessage());
             return false;
         }
@@ -521,7 +526,7 @@ public final class FusionRoutingService {
             core.getClass().getMethod("setCatalystStack", ItemStack.class).invoke(core, stack);
             return true;
         } catch (ReflectiveOperationException exception) {
-            LOGGER.error("[AE2DraconicFusion] CRITICAL: Failed to call setCatalystStack on {} via reflection: {}", core,
+            LOGGER.error("Failed to call setCatalystStack on {} via reflection: {}", core,
                     exception.getMessage());
             return false;
         }
@@ -533,6 +538,11 @@ public final class FusionRoutingService {
         }
     }
 
+    /**
+     * Internal context used during a single routing pass to track which
+     * recipe ingredients have already been matched to injectors, and
+     * to support rollback if routing fails mid-way.
+     */
     private static final class RecipeRoutingContext {
         private final boolean recipeAware;
         private final List<Ingredient> remainingIngredients;
@@ -560,9 +570,9 @@ public final class FusionRoutingService {
         }
 
         /**
-         * B004: recipe-unaware context but WITH a known catalyst ingredient.
-         * Injector routing remains permissive (recipeAware=false) while catalyst
-         * routing is active.
+         * Recipe-unaware context but WITH a known catalyst ingredient.
+         * Injector routing remains permissive (recipeAware=false) while
+         * catalyst routing is active.
          */
         static RecipeRoutingContext disabledWithKnownCatalyst(Ingredient knownCatalyst, ItemStack currentCatalyst) {
             return new RecipeRoutingContext(false, List.of(), knownCatalyst, currentCatalyst, false);
