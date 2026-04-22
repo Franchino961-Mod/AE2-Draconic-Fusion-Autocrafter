@@ -9,12 +9,18 @@ import appeng.api.upgrades.IUpgradeableObject;
 
 import java.util.Optional;
 
+/**
+ * Utility class for detecting Fusion Routing Cards on AE2 buses
+ * and locating Draconic Evolution Fusion Crafting Cores in the world.
+ * Uses class name comparison to avoid a compile-time dependency on DE.
+ */
 public final class FusionBusAccess {
     private static final String FUSION_CORE_CLASS = "com.brandon3055.draconicevolution.blocks.tileentity.TileFusionCraftingCore";
 
     private FusionBusAccess() {
     }
 
+    /** Checks whether the given BlockEntity has a Fusion Routing Card upgrade installed. */
     public static boolean hasFusionRoutingCard(BlockEntity host) {
         if (!(host instanceof IUpgradeableObject upgradeableObject)) {
             return false;
@@ -23,6 +29,7 @@ public final class FusionBusAccess {
         return upgradeableObject.isUpgradedWith(ModItems.FUSION_ROUTING_CARD.get());
     }
 
+    /** Finds a Fusion Crafting Core in any of the six adjacent positions. */
     public static Optional<BlockPos> resolveAdjacentFusionCore(ServerLevel level, BlockPos busPos) {
         if (level == null || busPos == null) {
             return Optional.empty();
@@ -39,6 +46,7 @@ public final class FusionBusAccess {
         return Optional.empty();
     }
 
+    /** Finds the nearest Fusion Crafting Core within a cubic range. */
     public static Optional<BlockPos> resolveFusionCoreInRange(ServerLevel level, BlockPos originPos, int range) {
         if (level == null || originPos == null || range < 0) {
             return Optional.empty();
