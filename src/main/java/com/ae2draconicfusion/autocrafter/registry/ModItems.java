@@ -10,6 +10,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+/** Registry for all mod items: block items, parts, and upgrade cards. */
 public final class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Ae2DraconicFusionAutocrafterMod.MOD_ID);
 
@@ -20,7 +21,7 @@ public final class ModItems {
             () -> new PartItem<>(new Item.Properties(), DraconicPatternProviderPart.class, DraconicPatternProviderPart::new));
 
     public static final DeferredItem<Item> FUSION_ROUTING_CARD = ITEMS.register("fusion_routing_card",
-            () -> Upgrades.createUpgradeCardItem(new Item.Properties().stacksTo(1)));
+            () -> Upgrades.createUpgradeCardItem(new Item.Properties().stacksTo(1))); // No recipe yet
 
     private ModItems() {
     }
