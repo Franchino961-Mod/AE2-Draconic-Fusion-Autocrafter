@@ -13,6 +13,11 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Registry for the ME Draconic Pattern Provider block and its BlockEntity.
+ * Uses AtomicReference to resolve the circular dependency between
+ * the BlockEntityType and its factory constructor.
+ */
 public final class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(Ae2DraconicFusionAutocrafterMod.MOD_ID);
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE,
@@ -22,8 +27,8 @@ public final class ModBlocks {
             "me_draconic_pattern_provider",
             DraconicPatternProviderBlock::new);
 
-            public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<PatternProviderBlockEntity>> ME_DRACONIC_PATTERN_PROVIDER_BE = BLOCK_ENTITY_TYPES
-                .register("me_draconic_pattern_provider", ModBlocks::createPatternProviderBlockEntityType);
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<PatternProviderBlockEntity>> ME_DRACONIC_PATTERN_PROVIDER_BE = BLOCK_ENTITY_TYPES
+            .register("me_draconic_pattern_provider", ModBlocks::createPatternProviderBlockEntityType);
 
     private ModBlocks() {
     }
