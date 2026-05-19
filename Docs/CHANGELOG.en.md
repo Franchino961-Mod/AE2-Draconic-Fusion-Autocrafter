@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.1] - May 2, 2026
+
+### Fixed
+- **B011 – Items voided on craft cancellation**: When a craft was cancelled with insufficient injectors,
+  items that had already been routed to injectors were permanently lost. The execution phase now performs
+  a full rollback (clears injectors and catalyst from the core) and returns `false` so AE2 correctly
+  keeps the items in the network.
+- **Code Quality**: Removed unnecessary `@SuppressWarnings` annotations and added explicit null-checks
+  before `@Nonnull`-annotated API calls in `FusionRoutingService`.
+- **Code Quality**: Added missing `@Nonnull` annotations on `getCloneItemStack` parameters in
+  `DraconicPatternProviderBlock` to match the inherited contract from `Block`.
+
+---
+
 ## [0.1.0] - April 22, 2026 (Initial Beta Release)
 
 ### Added
