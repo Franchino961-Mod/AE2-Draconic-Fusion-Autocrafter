@@ -7,6 +7,20 @@ e questo progetto aderisce a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [0.1.1] - 2 Maggio 2026
+
+### Risolto
+- **B011 – Item voided alla cancellazione del craft**: Quando un craft veniva cancellato con injector
+  insufficienti, gli item già inviati agli injector andavano persi definitivamente. La fase di esecuzione
+  ora esegue un rollback completo (svuota gli injector e il catalizzatore dal core) e restituisce `false`
+  in modo che AE2 mantenga correttamente gli item nella rete.
+- **Qualità del Codice**: Rimossi `@SuppressWarnings` non necessari e aggiunti null-check espliciti
+  prima delle chiamate API annotate con `@Nonnull` in `FusionRoutingService`.
+- **Qualità del Codice**: Aggiunte le annotazioni `@Nonnull` mancanti sui parametri di `getCloneItemStack`
+  in `DraconicPatternProviderBlock` per rispettare il contratto ereditato da `Block`.
+
+---
+
 ## [0.1.0] - 22 Aprile 2026 (Rilascio Iniziale Beta)
 
 ### Aggiunto
