@@ -201,13 +201,13 @@ public final class FusionRoutingService {
      * BEFORE any items are placed. This breaks the chicken-and-egg
      * dependency on {@code getActiveRecipe()} being non-null.
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public @Nullable CatalystInfo resolveCatalystForOutput(ServerLevel level, ItemStack patternOutput) {
         if (level == null || patternOutput == null || patternOutput.isEmpty()) {
             return null;
         }
         try {
             for (RecipeType<?> type : BuiltInRegistries.RECIPE_TYPE) {
+                @SuppressWarnings("null") // BuiltInRegistries.RECIPE_TYPE.getKey() can return null for unknown types
                 ResourceLocation typeId = BuiltInRegistries.RECIPE_TYPE.getKey(type);
                 if (typeId == null)
                     continue;
@@ -235,7 +235,7 @@ public final class FusionRoutingService {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "null" }) // Double-cast needed: RecipeType<?> -> RecipeType<T> for getAllRecipesFor
     private <I extends net.minecraft.world.item.crafting.RecipeInput, T extends net.minecraft.world.item.crafting.Recipe<I>> List<RecipeHolder<?>> getRecipes(
             ServerLevel level, RecipeType<?> type) {
         return (List<RecipeHolder<?>>) (Object) level.getRecipeManager().getAllRecipesFor((RecipeType<T>) type);
@@ -244,20 +244,21 @@ public final class FusionRoutingService {
     private boolean matchesRecipeOutput(Object recipe, ItemStack expected, ServerLevel level) {
         // Try 1.21+ API: getResultItem(HolderLookup.Provider)
         try {
-            Object result = recipe.getClass()
+            Object reflectResult = recipe.getClass()
                     .getMethod("getResultItem", net.minecraft.core.HolderLookup.Provider.class)
                     .invoke(recipe, level.registryAccess());
-            if (result instanceof ItemStack s && !s.isEmpty() && ItemStack.isSameItem(s, expected))
+            // Explicit null-check before isSameItem (@Nonnull parameter)
+            if (reflectResult instanceof ItemStack s && !s.isEmpty() && !expected.isEmpty() && ItemStack.isSameItem(s, expected))
                 return true;
         } catch (Exception ignored) {
         }
         // Fallback: getResultItem() without args
         Object result = invokeNoArg(recipe, "getResultItem");
-        if (result instanceof ItemStack s && !s.isEmpty() && ItemStack.isSameItem(s, expected))
+        if (result instanceof ItemStack s && !s.isEmpty() && !expected.isEmpty() && ItemStack.isSameItem(s, expected))
             return true;
         // Fallback: getOutput()
         result = invokeNoArg(recipe, "getOutput");
-        if (result instanceof ItemStack s && !s.isEmpty() && ItemStack.isSameItem(s, expected))
+        if (result instanceof ItemStack s && !s.isEmpty() && !expected.isEmpty() && ItemStack.isSameItem(s, expected))
             return true;
         return false;
     }
@@ -292,6 +293,57 @@ public final class FusionRoutingService {
 
     public FusionStructureScanner getStructureScanner() {
         return structureScanner;
+    }
+
+    /**
+     * Rolls back a partial delivery by clearing the catalyst from the core and
+     * removing from injectors any items that were placed during this session.
+     * Called when execution fails mid-way so no items are voided.
+     *
+     * @param placedStacks the sub-list of stacks that were successfully placed
+     *                     before the failure (may be empty)
+     */
+    public void rollbackDelivery(ServerLevel level, BlockPos corePos, List<ItemStack> placedStacks,
+            int scanRange, @Nullable CatalystInfo catalystInfo) {
+        if (placedStacks.isEmpty() && catalystInfo == null) {
+            return;
+        }
+
+        FusionStructureScanner.FusionStructureSnapshot snapshot = structureScanner.scan(level, corePos, scanRange);
+        if (!snapshot.validCore() || snapshot.core() == null) {
+            LOGGER.error("Rollback failed: cannot re-scan core at {}.", corePos);
+            return;
+        }
+
+        // Clear the catalyst from the core if it was placed during this session
+        if (catalystInfo != null) {
+            ItemStack currentCatalyst = getCurrentCatalyst(snapshot.core());
+            if (!currentCatalyst.isEmpty() && catalystInfo.ingredient().test(currentCatalyst)) {
+                invokeSetCatalyst(snapshot.core(), ItemStack.EMPTY);
+                LOGGER.debug("Rollback: cleared catalyst {} from core {}.", currentCatalyst.getItem(), corePos);
+            }
+        }
+
+        if (placedStacks.isEmpty()) {
+            return;
+        }
+
+        // For each item we successfully placed, find its injector and clear it
+        List<Object> orderedInjectors = orderInjectorsDeterministically(snapshot.corePos(), snapshot.injectors());
+        int rollbackCount = 0;
+        for (ItemStack placed : placedStacks) {
+            for (Object injector : orderedInjectors) {
+                Object currentStack = invokeNoArg(injector, "getInjectorStack");
+                // Explicit null-check before isSameItem (@Nonnull parameter)
+                if (currentStack instanceof ItemStack stack && !stack.isEmpty() && !placed.isEmpty() && ItemStack.isSameItem(stack, placed)) {
+                    invokeSetStack(injector, ItemStack.EMPTY);
+                    rollbackCount++;
+                    LOGGER.debug("Rollback: cleared {} from injector {}.", placed.getItem(), resolveInjectorPos(injector));
+                    break; // Only clear one injector per placed item
+                }
+            }
+        }
+        LOGGER.debug("Rollback complete for core {}: {} injectors cleared.", corePos, rollbackCount);
     }
 
     private BlockPos resolveInjectorPos(Object injector) {
