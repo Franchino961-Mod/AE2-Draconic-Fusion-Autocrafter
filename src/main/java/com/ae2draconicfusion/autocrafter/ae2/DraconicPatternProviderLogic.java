@@ -90,15 +90,23 @@ public final class DraconicPatternProviderLogic extends PatternProviderLogic {
             }
         }
 
-        // 5. EXECUTION: Actually place the items
-        for (ItemStack stack : stacksToRoute) {
+        // 5. EXECUTION: Actually place the items.
+        // We track how many have been successfully placed so we can roll back cleanly
+        // if one fails, returning false so AE2 keeps the items in the network.
+        for (int i = 0; i < stacksToRoute.size(); i++) {
+            ItemStack stack = stacksToRoute.get(i);
             FusionRoutingResult realResult = routingService.routeItemStackToFusionStructure(
                 serverLevel, corePos, stack, DEFAULT_SCAN_RANGE, false, catalystInfo);
             if (realResult != FusionRoutingResult.SUCCESS) {
-                LOGGER.error("Atomic delivery failed at execution phase! State might be inconsistent.");
-                return true; // Return true because some items WERE consumed
+                LOGGER.error(
+                    "Atomic delivery failed at execution phase on item {} of {}! Rolling back {} already-placed items.",
+                    i + 1, stacksToRoute.size(), i);
+                // Roll back all items placed in this session so nothing is voided
+                routingService.rollbackDelivery(serverLevel, corePos, stacksToRoute.subList(0, i),
+                    DEFAULT_SCAN_RANGE, catalystInfo);
+                return false;
             }
-            LOGGER.debug("Atomic route: {} -> SUCCESS", stack.getItem());
+            LOGGER.debug("Atomic route: {} -> SUCCESS ({}/{})", stack.getItem(), i + 1, stacksToRoute.size());
         }
 
         // 6. AUTO-START: All items are in, trigger the craft!
