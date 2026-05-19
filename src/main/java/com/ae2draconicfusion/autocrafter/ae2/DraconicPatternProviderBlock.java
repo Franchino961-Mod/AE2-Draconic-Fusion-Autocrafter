@@ -8,6 +8,8 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import com.ae2draconicfusion.autocrafter.registry.ModItems;
+import javax.annotation.Nonnull;
+import java.util.Objects;
 
 /**
  * Custom AE2 Pattern Provider block for Draconic Evolution Fusion Crafting.
@@ -20,7 +22,7 @@ public final class DraconicPatternProviderBlock extends PatternProviderBlock {
     }
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
-        return new ItemStack(ModItems.ME_DRACONIC_PATTERN_PROVIDER.get());
+    public ItemStack getCloneItemStack(@Nonnull LevelReader level, @Nonnull BlockPos pos, @Nonnull BlockState state) {
+        return new ItemStack(Objects.requireNonNull(ModItems.ME_DRACONIC_PATTERN_PROVIDER.get()));
     }
 }
