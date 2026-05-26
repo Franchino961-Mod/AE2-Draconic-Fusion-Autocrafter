@@ -166,6 +166,8 @@ node_modules/
 *.sqlite
 *.sqlite3
 *.db
+*.db-journal
+*.db-wal
 *.mdb
 *.sublime-workspace
 *.sublime-project
@@ -177,7 +179,16 @@ node_modules/
 Docs/*
 !README.*.md
 !CHANGELOG.*.md
-!Docs/assets/
-Docs/assets/*
-!Docs/assets/**
+!assets/
+
+# Local scripting and backups
+backup/
+config/
 *.ps1
+*.bat
+*.cmd
+*.sh
+
+# Whitelist gradle wrappers
+!gradlew
+!gradlew.bat
