@@ -34,46 +34,76 @@ e questo progetto aderisce a [Semantic Versioning](https://semver.org/spec/v2.0.
 ## [0.1.0] - 2026-04-22
 
 ### Aggiunto
-- **Automazione Core**
-  - Supporto nativo AE2 per il Fusion Crafting di Draconic Evolution.
-  - **ME Draconic Pattern Provider**: Variante a blocco dedicata per i setup di fusione.
-  - **ME Draconic Pattern Provider (Panel)**: Variante a pannello elegante per automazioni compatte.
 - **Ricette**
   - Aggiunta ricetta nativa **Fusion Crafting** per il ME Draconic Pattern Provider.
   - Aggiunta ricetta **Shapeless Crafting** per convertire il blocco Pattern Provider nella sua variante Panel.
-- **Sistema di Routing Intelligente**
-  - **Rilevamento Catalizzatore**: Identifica e invia automaticamente l'oggetto catalizzatore direttamente al Fusion Core.
-  - **Routing "Recipe-Aware"**: Confronta dinamicamente gli ingredienti con la ricetta di fusione attiva per garantire il corretto posizionamento.
-  - **Selezione Deterministica Injector**: Distribuzione intelligente degli oggetti agli injector in base alla distanza e all'orientamento.
-- **Stabilità e Performance**
-  - **Logica di Retry Intelligente**: Previene i fallimenti di AE2 gestendo gli stati di core "Occupato" o "In Carica".
-  - **Gestione Nativa delle Capability**: Funziona con le capability di NeoForge senza bloccare gli inventari originali del mod.
-  - **Integrazione Async**: Completamente compatibile con il flusso di inserimento basato su simulazione di AE2.
-- **Asset & Modelli**
-  - Texture per le parti, l'oggetto scheda di routing e il blocco pattern provider.
-  - Modelli per blocco pattern provider, oggetto, pannello, scheda di routing e parti (inclusi canali attivi, accesi e spenti).
-  - File di localizzazione di base in inglese e italiano.
-  - Configurazione dei blockstate e metadati di pacchetto/mod.
-- **Registro**
-  - Registrazione di blocchi, oggetti e schede creative del mod.
 - **Documentazione**
-  - README iniziale con istruzioni di installazione, screenshot e diagrammi.
+  - Ampliato il README con immagini e schemi delle ricette e dei pattern.
+- **Asset**
+  - Aggiornata l'icona ufficiale della mod.
 
 ### Risolto
-- **Compatibilità**
-  - Corretto il formato delle ricette per Draconic Evolution 3.x (sistemati `techLevel`, `totalEnergy` e l'annidamento degli ingredienti).
-  - Corretto il supporto **Jade/Waila**: i blocchi ora mostrano correttamente "ME Draconic Pattern Provider" invece di "Air".
-- **UI/UX**
-  - Corretti i titoli della GUI: la schermata del Pattern Provider ora mostra correttamente il nome personalizzato della mod invece del titolo predefinito di AE2.
-  - Risolto il bug della versione nel menu mod di NeoForge (risolto il problema "0.0NONE").
 - **Qualità del Codice**
-  - Pulizia completa del codice: rimossi import inutilizzati, pacchetti vuoti e migliorati i commenti per chiarezza in tutte le classi.
-  - Aggiunto Javadoc a tutte le classi principali e alle voci di registro.
-  - Log ottimizzati: spostati i log diagnostici ridondanti al livello DEBUG.
+  - Pulizia estesa dei commenti, formattazione e ottimizzazione della chiarezza dei log per tutte le classi (es. `FusionStructureScanner`, `FusionRoutingService`, `DraconicPatternProviderPart`).
 
-### Tecnico
-- Piattaforma: NeoForge 1.21.1
-- Dipendenze: AE2 (19.2.17+), Draconic Evolution (3.1.4.632+)
+---
+
+## [0.0.4] - 2026-04-21
+
+### Aggiunto
+- **Integrazioni**
+  - Registrazione dei BlockEntities per il supporto e la visualizzazione in Jade/Waila e AE2.
+- **Funzionalità**
+  - Metodi per nome personalizzato e display name per `DraconicPatternProviderPart` e `DraconicPatternProviderBlockEntity`.
+  - Aggiunto metodo clone item stack a `DraconicPatternProviderBlock`.
+  - Aggiunta configurazione JSON per il pattern provider di Draconic Fusion Autocrafter.
+- **Documentazione**
+  - Aggiunte immagini dell'installazione e schemi di configurazione.
+
+### Modificato
+- **Sistema di Build**
+  - Rifattorizzati `build.gradle` e `gradle.properties` per una migliore gestione degli attributi manifest e processing delle risorse.
+  - Aggiornata la gestione del placeholder di versione in `neoforge.mods.toml`.
+
+---
+
+## [0.0.3] - 2026-04-20
+
+### Aggiunto
+- **Logica Core**
+  - Implementata logica dello scanner di struttura per scansionare i setup multi-blocco di fusione.
+  - Implementato servizio core di routing per catalizzatori e ingredienti.
+  - Creata enumerazione per i risultati di routing.
+- **Integrazione AE2**
+  - Aggiunti blocchi e parti ME Draconic Pattern Provider personalizzati.
+  - Aggiunta logica del pattern provider e block entity personalizzata.
+  - Implementata integrazione upgrade della scheda per la Fusion Routing Card.
+  - Implementate utility di accesso al bus di fusione AE2.
+
+---
+
+## [0.0.2] - 2026-04-20
+
+### Aggiunto
+- **Registro**
+  - Registrazione di blocchi, oggetti (inclusa la Fusion Routing Card) e schede creative della mod.
+- **Asset & Modelli**
+  - Icona della mod e configurazioni dei metadati del pacchetto.
+  - Blockstate di base per il ME Draconic Pattern Provider.
+  - File di traduzione in inglese e italiano.
+  - Modelli 3D per blocco, oggetto, pannello, scheda di routing e parti (inclusi canali attivi, accesi e spenti).
+  - Texture per parti, blocchi e schede di routing.
+
+---
+
+## [0.0.1] - 2026-04-20
+
+### Aggiunto
+- **Bootstrap**
+  - Struttura iniziale del progetto e configurazione dei metadati.
+  - Configurato il sistema di build con script Gradle, settings, properties, wrapper scripts e file batch.
+  - README iniziale del progetto.
+  - Aggiunte regole iniziali del file `.gitignore`.
 
 ---
 
@@ -85,7 +115,7 @@ e questo progetto aderisce a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ### Fase 2 - Logica Core ✅
 - Implementazione del Routing Service.
-- Integrazione basata su reflection con Draconic Evolution.
+- Reflection-based integration with Draconic Evolution.
 - Sistema di snapshot per la scansione multi-block.
 
 ### Fase 3 - Integrazione AE2 ✅
