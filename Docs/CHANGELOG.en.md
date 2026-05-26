@@ -2,26 +2,36 @@
 
 All notable changes to the **AE2 Draconic Fusion Autocrafter** mod will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [0.1.1] - May 2, 2026
+## [0.1.2] - 2026-05-26
 
-### Fixed
-- **B011 – Items voided on craft cancellation**: When a craft was cancelled with insufficient injectors,
-  items that had already been routed to injectors were permanently lost. The execution phase now performs
-  a full rollback (clears injectors and catalyst from the core) and returns `false` so AE2 correctly
-  keeps the items in the network.
-- **Code Quality**: Removed unnecessary `@SuppressWarnings` annotations and added explicit null-checks
-  before `@Nonnull`-annotated API calls in `FusionRoutingService`.
-- **Code Quality**: Added missing `@Nonnull` annotations on `getCloneItemStack` parameters in
-  `DraconicPatternProviderBlock` to match the inherited contract from `Block`.
+### Added
+- **Translations**: Added localized translations for German (`de_de`), Spanish (`es_es`), French (`fr_fr`), Portuguese (Brazil) (`pt_br`), Russian (`ru_ru`), and Chinese (Simplified) (`zh_cn`).
+- **Project Configuration**: Added `.gitattributes` file to normalize line endings (LF) for code, resources, properties, markdown, and scripts.
+
+### Changed
+- **Documentation**: Expanded README with details on requirements (Java 21+), installation steps, client/server behavior, compatibility, limitations, troubleshooting, FAQ, and support channels.
+- **Git Configuration**: Updated `.gitignore` to exclude database journal files, local scripting files, and whitelist Gradle wrappers.
 
 ---
 
-## [0.1.0] - April 22, 2026 (Initial Beta Release)
+## [0.1.1] - 2026-05-19
+
+### Added
+- **Documentation**: Added ME Draconic Pattern Provider pattern example image to documentation.
+
+### Fixed
+- **B011 – Items voided on craft cancellation**: Resolved critical bug where items routed to injectors were lost upon craft cancellation with insufficient injectors. The execution phase now performs a full rollback (clears injectors and catalyst from the core) and returns `false` to retain items in the AE2 network.
+- **Code Quality**: Removed unnecessary `@SuppressWarnings` annotations and added explicit null-checks before `@Nonnull`-annotated API calls in `FusionRoutingService`.
+- **Code Quality**: Added missing `@Nonnull` annotations on `getCloneItemStack` parameters in `DraconicPatternProviderBlock` to match block interface contracts.
+
+---
+
+## [0.1.0] - 2026-04-22
 
 ### Added
 - **Core Automation**
@@ -39,6 +49,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Smart Retry Logic**: Prevents AE2 routing failures by gracefully handling "Busy" or "Charging" core states.
   - **Native Capability Handling**: Works with NeoForge capabilities without shadowing or blocking original mod inventories.
   - **Async Integration**: Fully compatible with AE2's simulation-based insertion flow.
+- **Assets & Models**
+  - Textures for parts, routing card item, and pattern provider block.
+  - Models for pattern provider block, item, panel item, routing card, and parts (including active channel, on, and off states).
+  - Italian and English localization base translation files.
+  - Blockstates and pack/mod metadata configuration.
+- **Registry**
+  - Mod blocks, items, and creative tab registration.
+- **Documentation**
+  - Initial README with setup instructions, screenshots, and diagrams.
 
 ### Fixed
 - **Compatibility**
@@ -48,7 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed GUI titles: the Pattern Provider screen now correctly displays the custom mod name instead of the default AE2 title.
   - Fixed mod version display in the NeoForge mod menu (resolved "0.0NONE" issue).
 - **Code Quality**
-  - Comprehensive code cleanup: removed unused imports and empty packages.
+  - Comprehensive code cleanup: removed unused imports, empty packages, and refined comments for clarity across all classes.
   - Added Javadocs to all major classes and registry entries.
   - Optimized logging: moved noisy diagnostic logs to DEBUG level.
 
