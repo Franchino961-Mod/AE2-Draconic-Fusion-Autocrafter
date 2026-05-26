@@ -34,46 +34,76 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2026-04-22
 
 ### Added
-- **Core Automation**
-  - Native AE2 support for Draconic Evolution Fusion Crafting.
-  - **ME Draconic Pattern Provider**: A dedicated block variant for fusion setups.
-  - **ME Draconic Pattern Provider (Panel)**: A sleek panel variant for compact automation.
 - **Recipes**
   - Added native **Fusion Crafting** recipe for the ME Draconic Pattern Provider.
   - Added **Shapeless Crafting** recipe to convert the Pattern Provider block into its Panel variant.
-- **Intelligent Routing System**
-  - **Catalyst Detection**: Automatically identifies and routes the catalyst item directly to the Fusion Core.
-  - **Recipe-Aware Routing**: Dynamically matches ingredients against the active fusion recipe to ensure correct placement.
-  - **Deterministic Injector Selection**: Smart distribution of items to injectors based on distance and orientation.
-- **Stability & Performance**
-  - **Smart Retry Logic**: Prevents AE2 routing failures by gracefully handling "Busy" or "Charging" core states.
-  - **Native Capability Handling**: Works with NeoForge capabilities without shadowing or blocking original mod inventories.
-  - **Async Integration**: Fully compatible with AE2's simulation-based insertion flow.
-- **Assets & Models**
-  - Textures for parts, routing card item, and pattern provider block.
-  - Models for pattern provider block, item, panel item, routing card, and parts (including active channel, on, and off states).
-  - Italian and English localization base translation files.
-  - Blockstates and pack/mod metadata configuration.
-- **Registry**
-  - Mod blocks, items, and creative tab registration.
 - **Documentation**
-  - Initial README with setup instructions, screenshots, and diagrams.
+  - Expanded README with recipes and pattern setup images.
+- **Assets**
+  - Updated the official mod icon.
 
 ### Fixed
-- **Compatibility**
-  - Fixed Draconic Evolution 3.x recipe format (corrected `techLevel`, `totalEnergy`, and ingredient nesting).
-  - Fixed **Jade/Waila** support: blocks now correctly display as "ME Draconic Pattern Provider" instead of "Air".
-- **UI/UX**
-  - Fixed GUI titles: the Pattern Provider screen now correctly displays the custom mod name instead of the default AE2 title.
-  - Fixed mod version display in the NeoForge mod menu (resolved "0.0NONE" issue).
 - **Code Quality**
-  - Comprehensive code cleanup: removed unused imports, empty packages, and refined comments for clarity across all classes.
-  - Added Javadocs to all major classes and registry entries.
-  - Optimized logging: moved noisy diagnostic logs to DEBUG level.
+  - Comprehensive comment cleanup, formatting, and logging clarity improvements across all classes (e.g. `FusionStructureScanner`, `FusionRoutingService`, `DraconicPatternProviderPart`).
 
-### Technical
-- Platform: NeoForge 1.21.1
-- Dependencies: AE2 (19.2.17+), Draconic Evolution (3.1.4.632+)
+---
+
+## [0.0.4] - 2026-04-21
+
+### Added
+- **Integrations**
+  - Registered BlockEntities for Jade/Waila and AE2 visual representation.
+- **Features**
+  - Custom name and display name methods for `DraconicPatternProviderPart` and `DraconicPatternProviderBlockEntity`.
+  - Added clone item stack method to `DraconicPatternProviderBlock`.
+  - Added JSON configuration for Draconic Fusion Autocrafter pattern provider.
+- **Documentation**
+  - Added setup diagrams and installation screenshots.
+
+### Changed
+- **Build System**
+  - Refactored `build.gradle` and `gradle.properties` for better manifest attributes and resource processing.
+  - Updated version placeholder handling in `neoforge.mods.toml`.
+
+---
+
+## [0.0.3] - 2026-04-20
+
+### Added
+- **Core Logic**
+  - Implemented structure scanner logic to scan multi-block fusion setups.
+  - Implemented core routing service for catalysts and ingredients.
+  - Created routing result enumeration.
+- **AE2 Integration**
+  - Added custom ME Draconic Pattern Provider blocks and parts.
+  - Added pattern provider logic and custom block entity.
+  - Implemented card upgrade integration for the Fusion Routing Card.
+  - Implemented AE2 fusion bus access utilities.
+
+---
+
+## [0.0.2] - 2026-04-20
+
+### Added
+- **Registry**
+  - Registered mod blocks, items (including the Fusion Routing Card), and custom creative tabs.
+- **Assets & Models**
+  - Mod icon and pack metadata configurations.
+  - Base blockstate files for the ME Draconic Pattern Provider.
+  - Translation files for English and Italian.
+  - 3D models for block, item, panel item, routing card, and parts (including active channel, on, and off states).
+  - Textures for parts, blocks, and routing card items.
+
+---
+
+## [0.0.1] - 2026-04-20
+
+### Added
+- **Bootstrap**
+  - Initial project structure setup and metadata.
+  - Configured build system with Gradle build scripts, settings, properties, wrapper scripts, and batch files.
+  - Initial project README.
+  - Added initial `.gitignore` rules.
 
 ---
 
