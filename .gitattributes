@@ -1,0 +1,22 @@
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# Force LF line endings for code and resources
+*.java       text eol=lf
+*.json       text eol=lf
+*.toml       text eol=lf
+*.gradle     text eol=lf
+*.properties text eol=lf
+*.md         text eol=lf
+*.txt        text eol=lf
+gradlew      text eol=lf
+*.bat        text eol=crlf
+
+# Define binary assets (do not normalize)
+*.png        binary
+*.jpg        binary
+*.ogg        binary
+*.wav        binary
+*.jar        binary
+*.class      binary
+*.zip        binary
