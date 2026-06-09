@@ -192,3 +192,4 @@ config/
 # Whitelist gradle wrappers
 !gradlew
 !gradlew.bat
+!gradle/wrapper/gradle-wrapper.jar
