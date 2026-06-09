@@ -46,7 +46,7 @@ Grazie a Pattern Provider personalizzati e a una logica di routing intelligente,
 
 ### Configurazione dell'Automazione
 
-1. **Crea** un `ME Draconic Pattern Provider` (Blocco o Pannello). ![Crafting Recipe](assets/images/ME_Draconic_Pattern_Provider-Recipe_Small.png)
+1. **Crea** un `ME Draconic Pattern Provider` (Blocco o Pannello). ![Crafting Recipe](assets/image/ME_Draconic_Pattern_Provider-Recipe_Small.png)
 2. **Posizionalo** adiacente a un **Draconic Fusion Crafting Core**.
 3. **Configura** le tue ricette di Fusione nei Pattern AE2 normalmente (Input da un lato, Output dall'altro).
 4. **Inserisci** i pattern nel Draconic Pattern Provider.
@@ -55,7 +55,7 @@ Grazie a Pattern Provider personalizzati e a una logica di routing intelligente,
     - Distribuirà gli ingredienti in modo deterministico agli injector validi nel raggio d'azione.
     - Aspetterà che il Core sia libero prima di inviare la ricetta successiva.
 
-![ME Draconic Pattern Provider setup](assets/images/ME_Draconic_Pattern_Provider.png)
+![ME Draconic Pattern Provider setup](assets/image/ME_Draconic_Pattern_Provider.png)
 
 ---
 
