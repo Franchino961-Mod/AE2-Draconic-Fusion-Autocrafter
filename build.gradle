@@ -2,6 +2,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'net.neoforged.moddev' version '2.0.74'
+    id 'me.modmuss50.mod-publish-plugin' version '0.5.1'
 }
 
 group = mod_group_id
@@ -83,3 +84,46 @@ tasks.withType(ProcessResources).configureEach {
         expand replaceProperties
     }
 }
+
+// Helper function to extract only the latest version's changelog from Docs/CHANGELOG.en.md
+def getLatestChangelog() {
+    def changelogFile = file('Docs/CHANGELOG.en.md')
+    if (!changelogFile.exists()) return "No changelog found."
+    def lines = changelogFile.readLines()
+    def content = []
+    def recording = false
+    for (line in lines) {
+        if (line.startsWith("## [")) {
+            if (recording) {
+                break // Found previous version, stop
+            }
+            recording = true
+            content.add(line)
+            continue
+        }
+        if (recording) {
+            if (line.trim() == "---") {
+                break
+            }
+            content.add(line)
+        }
+    }
+    return content.join("\n").trim()
+}
+
+publishMods {
+    file = tasks.named('jar').flatMap { it.archiveFile }
+    changelog = getLatestChangelog()
+    type = STABLE
+    
+    curseforge {
+        accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+        projectId = curseforge_project_id
+        minecraftVersions.add(minecraft_version)
+        modLoaders.add("neoforge")
+        
+        clientRequired = true
+        serverRequired = true
+    }
+}
+
