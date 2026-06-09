@@ -7,6 +7,13 @@ e questo progetto aderisce a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [0.1.3] - 2026-06-09
+
+### Risolto
+- **Drop al disassemblaggio/rottura**: Risolto un bug per cui facendo shift-tasto destro sul ME Draconic Pattern Provider con una chiave inglese (come il Configurator di Mekanism o il Certus Quartz Wrench di AE2) o rompendolo normalmente, il blocco veniva eliminato senza droppare nulla. Aggiunta la loot table mancante per il blocco.
+
+---
+
 ## [0.1.2] - 2026-05-26
 
 ### Aggiunto
