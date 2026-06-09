@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.3] - 2026-06-09
+
+### Fixed
+- **Dismantling/Breaking drops**: Resolved a bug where shift-right-clicking the ME Draconic Pattern Provider with a wrench (such as the Mekanism Configurator or AE2 Certus Quartz Wrench) or breaking it normally would delete the block and drop nothing. Added the missing block loot table.
+
+---
+
 ## [0.1.2] - 2026-05-26
 
 ### Added
