@@ -24,6 +24,7 @@ Desktop.ini
 *.swp
 *.swo
 *~
+.eclipse
 
 # Backups / temporary files
 *.bak
