@@ -18,7 +18,11 @@ import java.util.Objects;
  */
 public final class DraconicPatternProviderBlock extends PatternProviderBlock {
     public void bindBlockEntityType(BlockEntityType<PatternProviderBlockEntity> blockEntityType) {
-        setBlockEntity(PatternProviderBlockEntity.class, blockEntityType, null, null);
+        setBlockEntity(
+                PatternProviderBlockEntity.class,
+                blockEntityType,
+                null,
+                null);
     }
 
     @Override
