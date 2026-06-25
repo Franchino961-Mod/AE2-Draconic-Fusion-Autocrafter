@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.4] - 2026-06-25
+
+### Fixed
+- **Grid Reconnection Bug**: Resolved a critical issue where the ME Draconic Pattern Provider would lose its connection to the ME network upon server restart/chunk reload, which previously required the block to be broken and replaced. The `IInWorldGridNodeHost` capability is now properly registered for the block entity.
+
+### Changed
+- **Code Refactor**: Removed unnecessary `@SuppressWarnings("null")` annotations in `FusionRoutingService.java`.
+- **Code Refactor**: Suppressed a benign `Null type mismatch` IDE warning in `ModBlocks.java` related to block entity builder types.
+- **Git**: Added `.eclipse` directory to `.gitignore`.
+
+---
+
 ## [0.1.3] - 2026-06-09
 
 ### Fixed
