@@ -207,7 +207,7 @@ public final class FusionRoutingService {
         }
         try {
             for (RecipeType<?> type : BuiltInRegistries.RECIPE_TYPE) {
-                @SuppressWarnings("null") // BuiltInRegistries.RECIPE_TYPE.getKey() can return null for unknown types
+                // BuiltInRegistries.RECIPE_TYPE.getKey() can return null for unknown types
                 ResourceLocation typeId = BuiltInRegistries.RECIPE_TYPE.getKey(type);
                 if (typeId == null)
                     continue;
@@ -235,7 +235,7 @@ public final class FusionRoutingService {
         return null;
     }
 
-    @SuppressWarnings({ "unchecked", "null" }) // Double-cast needed: RecipeType<?> -> RecipeType<T> for getAllRecipesFor
+    @SuppressWarnings("unchecked") // Double-cast needed: RecipeType<?> -> RecipeType<T> for getAllRecipesFor
     private <I extends net.minecraft.world.item.crafting.RecipeInput, T extends net.minecraft.world.item.crafting.Recipe<I>> List<RecipeHolder<?>> getRecipes(
             ServerLevel level, RecipeType<?> type) {
         return (List<RecipeHolder<?>>) (Object) level.getRecipeManager().getAllRecipesFor((RecipeType<T>) type);
