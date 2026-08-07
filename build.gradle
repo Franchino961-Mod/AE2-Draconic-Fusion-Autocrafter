@@ -128,4 +128,12 @@ publishMods {
         clientRequired = true
         serverRequired = true
     }
+
+    modrinth {
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        projectId = modrinth_project_id
+        minecraftVersions.add(minecraft_version)
+        modLoaders.add("neoforge")
+        displayName = "${mod_name} - ${mod_version}"
+    }
 }
