@@ -31,6 +31,7 @@ jobs:
         run: ./gradlew publishMods
         env:
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
