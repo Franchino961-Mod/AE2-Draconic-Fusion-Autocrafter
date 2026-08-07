@@ -5,6 +5,12 @@ Tutte le modifiche rilevanti al mod **AE2 Draconic Fusion Autocrafter** saranno 
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 e questo progetto aderisce a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2026-08-07
+
+### Risolto
+- **Tag di efficacia del piccone**: Corretto il percorso della cartella dei tag per i blocchi da `tags/blocks/mineable/` a `tags/block/mineable/`, ripristinando il corretto funzionamento del piccone sul blocco ME Draconic Pattern Provider.
+- **Titolo GUI dei Pattern Provider**: Rimosso il file di override della schermata nel namespace di AE2 (`assets/ae2/screens/pattern_provider.json`) che rinominava erroneamente la GUI di tutti i Pattern Provider standard di AE2 nel gioco.
+
 ---
 
 ## [0.1.4] - 2026-06-25
