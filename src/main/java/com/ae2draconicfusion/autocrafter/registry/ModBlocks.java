@@ -44,7 +44,7 @@ public final class ModBlocks {
 
     private static BlockEntityType<PatternProviderBlockEntity> createPatternProviderBlockEntityType() {
         AtomicReference<BlockEntityType<PatternProviderBlockEntity>> typeRef = new AtomicReference<>();
-        @SuppressWarnings({"unchecked", "null"})
+        @SuppressWarnings("unchecked")
         BlockEntityType<PatternProviderBlockEntity> type = (BlockEntityType<PatternProviderBlockEntity>) (BlockEntityType<?>) BlockEntityType.Builder
                 .of((pos, state) -> new DraconicPatternProviderBlockEntity(typeRef.get(), pos, state), ME_DRACONIC_PATTERN_PROVIDER.get())
                 .build(null);
