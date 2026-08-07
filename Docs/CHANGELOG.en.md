@@ -5,6 +5,12 @@ All notable changes to the **AE2 Draconic Fusion Autocrafter** mod will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2026-08-07
+
+### Fixed
+- **Pickaxe Effectiveness Tag**: Fixed block tag directory path from `tags/blocks/mineable/` to `tags/block/mineable/` so Minecraft 1.21 properly recognizes the pickaxe effectiveness for the ME Draconic Pattern Provider block.
+- **Pattern Provider GUI Title Override**: Removed accidental screen override file in AE2's namespace (`assets/ae2/screens/pattern_provider.json`) that caused all standard AE2 Pattern Providers in the game to display "ME Draconic Pattern Provider".
+
 ---
 
 ## [0.1.4] - 2026-06-25
