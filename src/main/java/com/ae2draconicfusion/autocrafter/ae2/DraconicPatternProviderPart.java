@@ -10,7 +10,6 @@ import appeng.parts.crafting.PatternProviderPart;
 import com.ae2draconicfusion.autocrafter.Ae2DraconicFusionAutocrafterMod;
 import com.ae2draconicfusion.autocrafter.registry.ModItems;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -73,25 +72,5 @@ public final class DraconicPatternProviderPart extends PatternProviderPart {
     @Override
     public ItemStack getMainMenuIcon() {
         return new ItemStack(ModItems.ME_DRACONIC_PATTERN_PROVIDER_PANEL.get());
-    }
-
-    @Override
-    public boolean hasCustomName() {
-        return true;
-    }
-
-    @Override
-    public Component getCustomName() {
-        return Component.translatable("gui.ae2_draconic_fusion_autocrafter.me_draconic_pattern_provider");
-    }
-
-    @Override
-    public Component getName() {
-        return Component.translatable("block.ae2_draconic_fusion_autocrafter.me_draconic_pattern_provider");
-    }
-
-    @Override
-    public Component getDisplayName() {
-        return getCustomName();
     }
 }
