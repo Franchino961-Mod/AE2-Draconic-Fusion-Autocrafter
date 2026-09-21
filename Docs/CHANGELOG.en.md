@@ -5,6 +5,26 @@ All notable changes to the **AE2 Draconic Fusion Autocrafter** mod will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.6] - 2026-09-21
+
+### Added
+- **Translations**: Added Italian (`it_it`) translation.
+- **Recipes**: Added shapeless crafting recipe to convert ME Draconic Pattern Provider Panel back to a full Block.
+
+### Changed
+- **Dependencies**: Added explicit dependencies for `BrandonsCore` and `DraconicEvolution` to build process.
+- **Routing Logic**: `FusionRoutingService` now matches both catalyst and ingredients dynamically via the active `IFusionRecipe`, supporting exact NBT/Component matching (resolving issues with items like Draconic Energy Relay Crystals).
+- **Routing Logic**: `FusionRoutingService` now deterministically orders injectors by squared distance and relative direction for predictable execution.
+- **API usage**: Removed all reflection-based API access. The mod now hooks directly into native `TileFusionCraftingCore` and `IFusionInjector` interfaces.
+- **AE2 Integration**: `DraconicPatternProviderLogic` now correctly handles failed pattern pushes by returning `false`, allowing AE2's `ExecutingCraftingJob` to retry without voiding or locking items.
+
+### Removed
+- **Dead Code / Items**: Completely removed the deprecated `Fusion Routing Card` item, its assets (textures/models), language entries, and registration logic.
+- **Translations**: Removed custom name override for `DraconicPatternProviderBlockEntity` and `DraconicPatternProviderPart` to let the base class handle naming.
+- **Documentation**: Removed unverified integration claims from READMEs (JEI/REI/EMI, Sophisticated Storage) and updated the operating range to 8 blocks.
+
+---
+
 ## [0.1.5] - 2026-08-07
 
 ### Fixed
