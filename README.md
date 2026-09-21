@@ -4,7 +4,7 @@
 [![Download on CurseForge](https://img.shields.io/badge/Download_on-CurseForge-orange?style=for-the-badge&logo=curseforge)](https://www.curseforge.com/minecraft/mc-mods/ae2-draconic-fusion-autocrafter)
 
 [![Minecraft](https://img.shields.io/badge/Minecraft-1.21.1-green.svg)](https://www.minecraft.net/)
-[![Version](https://img.shields.io/badge/version-0.1.5-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-0.1.6-blue.svg)]()
 [![NeoForge](https://img.shields.io/badge/NeoForge-21.1.223-orange.svg)](https://neoforged.net/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -49,7 +49,7 @@ By providing custom Pattern Providers and intelligent routing logic, this mod en
 1. **Craft** an `ME Draconic Pattern Provider` (Block or Panel). ![Crafting Recipe](Docs/assets/image/ME_Draconic_Pattern_Provider-Recipe_Small.png)
 2. **Place** it adjacent to a **Draconic Fusion Crafting Core**.
 3. **Configure** your Fusion recipes in AE2 Patterns normally (Inputs on one side, Output on the other).
-4. **Insert** the patterns into the Draconic Pattern Provider.
+4. **Insert** the patterns into the Draconic Pattern Provider. (Note: The provider can detect the Fusion Core within an 8-block range, it does not need to be strictly adjacent!)
 5. **Start Crafting!** The mod will automatically:
     - Send the catalyst to the Core.
     - Deterministically distribute ingredients to the valid injectors in range.
@@ -90,8 +90,6 @@ By providing custom Pattern Providers and intelligent routing logic, this mod en
 
 - **Applied Energistics 2**: Deep integration.
 - **Draconic Evolution**: Full multi-block support.
-- **JEI/REI/EMI**: Integration for patterns.
-- **Sophisticated Storage/Backpacks**: Works with external inventories.
 - **Modpacks**: You are free to distribute and include this mod in any modpack.
 
 ---
@@ -110,7 +108,7 @@ By providing custom Pattern Providers and intelligent routing logic, this mod en
 - Check if another recipe is currently running in the same fusion setup.
 
 ### System locks up
-- Ensure the Pattern Provider is placed directly adjacent to the Fusion Crafting Core.
+- Ensure the Pattern Provider is within 8 blocks of the Fusion Crafting Core.
 
 ---
 
