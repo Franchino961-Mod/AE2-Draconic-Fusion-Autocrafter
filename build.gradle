@@ -47,6 +47,10 @@ dependencies {
     // Draconic Evolution integration surface + runtime for local development runs.
     compileOnly "com.brandon3055.draconicevolution:Draconic-Evolution:${draconic_version}"
     runtimeOnly "com.brandon3055.draconicevolution:Draconic-Evolution:${draconic_version}"
+
+    // Brandon's Core for compile-time access to base classes like TileBCore
+    compileOnly "com.brandon3055.brandonscore:BrandonsCore:${brandons_core_version}"
+    runtimeOnly "com.brandon3055.brandonscore:BrandonsCore:${brandons_core_version}"
 }
 
 tasks.withType(JavaCompile).configureEach {
