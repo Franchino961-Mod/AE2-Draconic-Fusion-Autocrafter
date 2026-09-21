@@ -2,7 +2,6 @@ package com.ae2draconicfusion.autocrafter.ae2;
 
 import appeng.api.crafting.IPatternDetails;
 import appeng.api.stacks.AEItemKey;
-import appeng.api.stacks.AEKey;
 import appeng.api.stacks.GenericStack;
 import appeng.api.stacks.KeyCounter;
 import appeng.helpers.patternprovider.PatternProviderLogic;
@@ -60,10 +59,7 @@ public final class DraconicPatternProviderLogic extends PatternProviderLogic {
 
         LOGGER.debug("pushPattern starting atomic delivery at {} for pattern {}.", providerPos, pattern.getDefinition());
 
-        // 2. Pre-resolve catalyst info (ingredient + count)
-        @Nullable FusionRoutingService.CatalystInfo catalystInfo = resolvePatternCatalyst(serverLevel, pattern);
-
-        // 3. Prepare the list of items to route
+        // 2. Prepare the list of items to route
         List<ItemStack> stacksToRoute = new ArrayList<>();
         if (inputs != null) {
             for (KeyCounter counter : inputs) {
@@ -78,6 +74,14 @@ public final class DraconicPatternProviderLogic extends PatternProviderLogic {
         if (stacksToRoute.isEmpty()) {
             return false;
         }
+
+        // 3. Pre-resolve catalyst info (ingredient + count) using actual inputs and expected primary output
+        ItemStack primaryOutput = ItemStack.EMPTY;
+        GenericStack aePrimaryOutput = pattern.getPrimaryOutput();
+        if (aePrimaryOutput != null && aePrimaryOutput.what() instanceof AEItemKey itemKey) {
+            primaryOutput = itemKey.toStack(1); // Usually we only need the item definition for matching
+        }
+        @Nullable FusionRoutingService.CatalystInfo catalystInfo = resolvePatternCatalyst(serverLevel, stacksToRoute, primaryOutput);
 
         // 4. SIMULATION: Verify that ALL items would fit
         // We use a simulation pass to ensure we don't start putting items if we can't finish.
@@ -115,20 +119,10 @@ public final class DraconicPatternProviderLogic extends PatternProviderLogic {
         return true;
     }
 
-    /**
-     * Resolves the catalyst ingredient for this pattern by looking up the
-     * fusion crafting recipe that matches the pattern's expected output.
-     * Called once per pushPattern invocation.
-     */
     @Nullable
-    private FusionRoutingService.CatalystInfo resolvePatternCatalyst(ServerLevel level, IPatternDetails pattern) {
+    private FusionRoutingService.CatalystInfo resolvePatternCatalyst(ServerLevel level, List<ItemStack> patternInputs, ItemStack primaryOutput) {
         try {
-            GenericStack primaryOutput = pattern.getPrimaryOutput();
-            if (primaryOutput == null) return null;
-            AEKey outputKey = primaryOutput.what();
-            if (!(outputKey instanceof AEItemKey itemKey)) return null;
-            ItemStack outputStack = itemKey.toStack(1);
-            return routingService.resolveCatalystForOutput(level, outputStack);
+            return routingService.resolveCatalystForPattern(level, patternInputs, primaryOutput);
         } catch (Exception e) {
             LOGGER.debug("Failed to resolve pattern catalyst: {}", e.getMessage());
             return null;
