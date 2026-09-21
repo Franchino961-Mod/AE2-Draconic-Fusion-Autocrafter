@@ -5,6 +5,26 @@ Tutte le modifiche rilevanti al mod **AE2 Draconic Fusion Autocrafter** saranno 
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 e questo progetto aderisce a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.6] - 2026-09-21
+
+### Aggiunto
+- **Traduzioni**: Aggiunta la traduzione in italiano (`it_it`).
+- **Ricette**: Aggiunta la ricetta shapeless per riconvertire il Pannello ME Draconic Pattern Provider in un Blocco.
+
+### Modificato
+- **Dipendenze**: Aggiunte le dipendenze esplicite per `BrandonsCore` e `DraconicEvolution` al processo di build.
+- **Logica di Routing**: `FusionRoutingService` ora associa dinamicamente sia il catalizzatore che gli ingredienti tramite la ricetta `IFusionRecipe` attiva, supportando il matching esatto di NBT/Components (risolvendo i problemi con oggetti come i Draconic Energy Relay Crystals e uova di Productive Bees).
+- **Logica di Routing**: `FusionRoutingService` ora ordina gli iniettori in modo deterministico in base alla distanza al quadrato e alla direzione relativa per un'esecuzione prevedibile.
+- **Uso API**: Rimosso completamente l'accesso alle API tramite Reflection. La mod ora interagisce direttamente con le interfacce native `TileFusionCraftingCore` e `IFusionInjector`.
+- **Integrazione AE2**: `DraconicPatternProviderLogic` ora gestisce correttamente il fallimento di inserimento dei pattern restituendo `false`, permettendo all'`ExecutingCraftingJob` di AE2 di riprovare senza distruggere o bloccare gli oggetti.
+
+### Rimosso
+- **Codice / Oggetti Inutilizzati**: Rimossa completamente la `Fusion Routing Card` deprecata, inclusi asset (texture/modelli), chiavi di traduzione e logica di registrazione.
+- **Traduzioni**: Rimossa la sovrascrittura del nome personalizzato in `DraconicPatternProviderBlockEntity` e `DraconicPatternProviderPart` per delegare la gestione alla classe base.
+- **Documentazione**: Rimossi i claim di integrazione non verificati dai README (JEI/REI/EMI, Sophisticated Storage) e aggiornato il raggio d'azione documentato a 8 blocchi.
+
+---
+
 ## [0.1.5] - 2026-08-07
 
 ### Risolto
