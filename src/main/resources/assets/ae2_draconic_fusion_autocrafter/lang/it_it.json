@@ -1,7 +1,6 @@
 {
   "itemGroup.ae2_draconic_fusion_autocrafter": "AE2 Draconic Fusion Autocrafter",
-  "block.ae2_draconic_fusion_autocrafter.me_draconic_pattern_provider": "ME Draconic Pattern Provider",
-  "item.ae2_draconic_fusion_autocrafter.me_draconic_pattern_provider_panel": "ME Draconic Pattern Provider (Panel)",
-  "item.ae2_draconic_fusion_autocrafter.fusion_routing_card": "Fusion Routing Card",
-  "gui.ae2_draconic_fusion_autocrafter.me_draconic_pattern_provider": "ME Draconic Pattern Provider"
+  "block.ae2_draconic_fusion_autocrafter.me_draconic_pattern_provider": "Fornitore di Pattern Draconico ME",
+  "item.ae2_draconic_fusion_autocrafter.me_draconic_pattern_provider_panel": "Fornitore di Pattern Draconico ME (Pannello)",
+  "gui.ae2_draconic_fusion_autocrafter.me_draconic_pattern_provider": "Fornitore di Pattern Draconico ME"
 }
