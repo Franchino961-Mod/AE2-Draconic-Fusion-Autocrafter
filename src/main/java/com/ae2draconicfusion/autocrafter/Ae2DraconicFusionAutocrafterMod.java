@@ -1,6 +1,5 @@
 package com.ae2draconicfusion.autocrafter;
 
-import com.ae2draconicfusion.autocrafter.ae2.AE2UpgradeIntegration;
 import com.ae2draconicfusion.autocrafter.ae2.DraconicPatternProviderPart;
 import appeng.blockentity.AEBaseBlockEntity;
 import com.ae2draconicfusion.autocrafter.registry.ModBlocks;
@@ -43,7 +42,6 @@ public final class Ae2DraconicFusionAutocrafterMod {
 
     private void onCommonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
-            AE2UpgradeIntegration.registerUpgrades();
             ModBlocks.bindBlockEntities();
 
             // Register BlockEntities for Jade/Waila and AE2 visual representation
@@ -79,7 +77,6 @@ public final class Ae2DraconicFusionAutocrafterMod {
 
     private void onBuildCreativeModeTabContents(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
-            event.accept(ModItems.FUSION_ROUTING_CARD.get());
             event.accept(ModItems.ME_DRACONIC_PATTERN_PROVIDER_PANEL.get());
         }
 
