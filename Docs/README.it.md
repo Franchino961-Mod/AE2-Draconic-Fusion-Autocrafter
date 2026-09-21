@@ -4,7 +4,7 @@
 [![Scarica su CurseForge](https://img.shields.io/badge/Scarica_su-CurseForge-orange?style=for-the-badge&logo=curseforge)](https://www.curseforge.com/minecraft/mc-mods/ae2-draconic-fusion-autocrafter)
 
 [![Minecraft](https://img.shields.io/badge/Minecraft-1.21.1-green.svg)](https://www.minecraft.net/)
-[![Version](https://img.shields.io/badge/version-0.1.5-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-0.1.6-blue.svg)]()
 [![NeoForge](https://img.shields.io/badge/NeoForge-21.1.223-orange.svg)](https://neoforged.net/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](../LICENSE)
 
@@ -49,7 +49,7 @@ Grazie a Pattern Provider personalizzati e a una logica di routing intelligente,
 1. **Crea** un `ME Draconic Pattern Provider` (Blocco o Pannello). ![Crafting Recipe](assets/image/ME_Draconic_Pattern_Provider-Recipe_Small.png)
 2. **Posizionalo** adiacente a un **Draconic Fusion Crafting Core**.
 3. **Configura** le tue ricette di Fusione nei Pattern AE2 normalmente (Input da un lato, Output dall'altro).
-4. **Inserisci** i pattern nel Draconic Pattern Provider.
+4. **Inserisci** i pattern nel Draconic Pattern Provider. (Nota: Il provider può rilevare il Fusion Core entro un raggio di 8 blocchi, non deve essere per forza adiacente!)
 5. **Inizia a Craftare!** La mod farà automaticamente quanto segue:
     - Invierà il catalizzatore al Core.
     - Distribuirà gli ingredienti in modo deterministico agli injector validi nel raggio d'azione.
@@ -90,8 +90,6 @@ Grazie a Pattern Provider personalizzati e a una logica di routing intelligente,
 
 - **Applied Energistics 2**: Integrazione profonda.
 - **Draconic Evolution**: Supporto completo multi-block.
-- **JEI/REI/EMI**: Supporto per la visualizzazione delle ricette e dei pattern.
-- **Sophisticated Storage/Backpacks**: Funziona con inventari esterni.
 - **Modpack**: Sei libero di includere e distribuire questa mod in qualsiasi modpack.
 
 ---
@@ -110,7 +108,7 @@ Grazie a Pattern Provider personalizzati e a una logica di routing intelligente,
 - Controlla se c'è un'altra ricetta in esecuzione nello stesso setup di fusione.
 
 ### Il sistema si blocca
-- Assicurati che il Pattern Provider sia posizionato direttamente adiacente al core di fusione.
+- Assicurati che il Pattern Provider sia posizionato entro un raggio di 8 blocchi dal core di fusione.
 
 ---
 
