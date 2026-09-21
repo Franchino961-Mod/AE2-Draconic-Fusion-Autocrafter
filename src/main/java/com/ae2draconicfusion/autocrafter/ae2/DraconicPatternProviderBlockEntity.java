@@ -7,7 +7,6 @@ import appeng.helpers.patternprovider.PatternProviderLogic;
 import appeng.helpers.patternprovider.PatternProviderLogicHost;
 import com.ae2draconicfusion.autocrafter.registry.ModItems;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -40,23 +39,5 @@ public final class DraconicPatternProviderBlockEntity extends PatternProviderBlo
         return new ItemStack(ModItems.ME_DRACONIC_PATTERN_PROVIDER.get());
     }
 
-    @Override
-    public boolean hasCustomName() {
-        return true;
-    }
 
-    @Override
-    public Component getCustomName() {
-        return Component.translatable("gui.ae2_draconic_fusion_autocrafter.me_draconic_pattern_provider");
-    }
-
-    @Override
-    public Component getName() {
-        return Component.translatable("block.ae2_draconic_fusion_autocrafter.me_draconic_pattern_provider");
-    }
-
-    @Override
-    public Component getDisplayName() {
-        return getCustomName();
-    }
 }
