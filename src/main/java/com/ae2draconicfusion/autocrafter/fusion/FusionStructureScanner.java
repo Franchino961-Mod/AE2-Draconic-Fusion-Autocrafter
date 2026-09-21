@@ -9,15 +9,15 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.brandon3055.draconicevolution.blocks.tileentity.TileFusionCraftingCore;
+import com.brandon3055.draconicevolution.api.crafting.IFusionInjector;
+
 /**
  * Scans the world around a Fusion Crafting Core to build a snapshot
  * of the structure (core state, connected injectors, validity).
- * Uses reflection to interact with Draconic Evolution's TileEntities
- * without a compile-time dependency on the DE API.
  */
 public final class FusionStructureScanner {
     private static final Logger LOGGER = LoggerFactory.getLogger(FusionStructureScanner.class);
-    private static final String FUSION_CORE_CLASS = "com.brandon3055.draconicevolution.blocks.tileentity.TileFusionCraftingCore";
 
     public FusionStructureSnapshot scan(ServerLevel level, BlockPos corePos, int range) {
         if (level == null || corePos == null || range < 0) {
@@ -28,47 +28,39 @@ public final class FusionStructureScanner {
         BlockEntity blockEntity = level.getBlockEntity(corePos);
         LOGGER.debug("BlockEntity at {}: {} (IsFusionCore={})",
                 corePos, blockEntity == null ? "null" : blockEntity.getClass().getSimpleName(),
-                blockEntity != null && FUSION_CORE_CLASS.equals(blockEntity.getClass().getName()));
+                blockEntity instanceof TileFusionCraftingCore);
 
-        if (blockEntity == null || !FUSION_CORE_CLASS.equals(blockEntity.getClass().getName())) {
+        if (!(blockEntity instanceof TileFusionCraftingCore core)) {
             LOGGER.debug("Scanner rejected core at {}: not a TileFusionCraftingCore (actual: {})", corePos,
                 blockEntity == null ? "null" : blockEntity.getClass().getName());
             return FusionStructureSnapshot.invalid(corePos);
         }
 
-        invokeNoArg(blockEntity, "updateInjectors");
+        core.updateInjectors();
 
-        Object isCraftingObj = invokeNoArg(blockEntity, "isCrafting");
-        boolean crafting = isCraftingObj instanceof Boolean b && b;
+        boolean crafting = core.isCrafting();
 
-        Object fusionState = invokeNoArg(blockEntity, "getFusionState");
+        Object fusionState = core.getFusionState();
         LOGGER.debug("Core at {} is in state: {} (isCrafting={})", corePos, fusionState, crafting);
 
         if (crafting) {
             // Core is actively crafting/charging — structurally valid but temporarily busy
-            return FusionStructureSnapshot.busy(corePos, blockEntity, fusionState);
+            return FusionStructureSnapshot.busy(corePos, core, fusionState);
         }
 
-        Object injectorsObject = invokeNoArg(blockEntity, "getInjectors");
-        if (!(injectorsObject instanceof List<?>)) {
-            LOGGER.debug("Scanner rejected core at {}: getInjectors() did not return a List", corePos);
-            return FusionStructureSnapshot.invalid(corePos);
-        }
-
-        List<?> rawInjectors = (List<?>) injectorsObject;
-        if (rawInjectors.isEmpty()) {
+        List<IFusionInjector> rawInjectors = core.getInjectors();
+        if (rawInjectors == null || rawInjectors.isEmpty()) {
             LOGGER.debug("Scanner found core at {} with no injectors", corePos);
-            return FusionStructureSnapshot.noInjectors(corePos, blockEntity, fusionState);
+            return FusionStructureSnapshot.noInjectors(corePos, core, fusionState);
         }
 
         boolean allInjectorsValid = true;
         int validCount = 0;
-        for (Object injector : rawInjectors) {
-            if (injector == null || !invokeValidate(injector)) {
+        for (IFusionInjector injector : rawInjectors) {
+            if (injector == null || !injector.validate()) {
                 allInjectorsValid = false;
-                LOGGER.debug("Injector {} is invalid (null={}, validate={})",
-                    injector == null ? "N/A" : injector.getClass().getSimpleName(),
-                    injector == null, injector != null && !invokeValidate(injector));
+                LOGGER.debug("Injector {} is invalid",
+                    injector == null ? "N/A" : injector.getClass().getSimpleName());
             } else {
                 validCount++;
             }
@@ -76,36 +68,11 @@ public final class FusionStructureScanner {
 
         if (!allInjectorsValid) {
             LOGGER.debug("Scanner rejected core at {}: {} valid injectors out of {}", corePos, validCount, rawInjectors.size());
-            return FusionStructureSnapshot.invalidInjectors(corePos, blockEntity, rawInjectors, fusionState);
+            return FusionStructureSnapshot.invalidInjectors(corePos, core, rawInjectors, fusionState);
         }
 
         LOGGER.debug("Scanner accepted core at {} with {} valid injectors", corePos, rawInjectors.size());
-        return FusionStructureSnapshot.valid(corePos, blockEntity, new ArrayList<>(rawInjectors), fusionState);
-    }
-
-    private Object invokeNoArg(Object target, String methodName) {
-        if (target == null) {
-            return null;
-        }
-
-        try {
-            return target.getClass().getMethod(methodName).invoke(target);
-        } catch (ReflectiveOperationException exception) {
-            return null;
-        }
-    }
-
-    private boolean invokeValidate(Object injector) {
-        if (injector == null) {
-            return false;
-        }
-
-        try {
-            Object result = injector.getClass().getMethod("validate").invoke(injector);
-            return result instanceof Boolean && (Boolean) result;
-        } catch (ReflectiveOperationException exception) {
-            return false;
-        }
+        return FusionStructureSnapshot.valid(corePos, core, new ArrayList<>(rawInjectors), fusionState);
     }
 
     /**
@@ -113,26 +80,26 @@ public final class FusionStructureScanner {
      * @param coreBusy   true if the core is CRAFTING or CHARGING (temporarily unavailable, but structurally valid).
      *                   When coreBusy is true, validCore is also true.
      */
-    public record FusionStructureSnapshot(boolean validCore, boolean coreBusy, BlockPos corePos, Object core, List<?> injectors, Object fusionState) {
+    public record FusionStructureSnapshot(boolean validCore, boolean coreBusy, BlockPos corePos, TileFusionCraftingCore core, List<IFusionInjector> injectors, Object fusionState) {
         public static FusionStructureSnapshot invalid(BlockPos corePos) {
             return new FusionStructureSnapshot(false, false, corePos, null, List.of(), null);
         }
 
         // Busy core is structurally valid — validCore=true so callers
         // can distinguish it from a missing core.
-        public static FusionStructureSnapshot busy(BlockPos corePos, Object core, Object fusionState) {
+        public static FusionStructureSnapshot busy(BlockPos corePos, TileFusionCraftingCore core, Object fusionState) {
             return new FusionStructureSnapshot(true, true, corePos, core, List.of(), fusionState);
         }
 
-        public static FusionStructureSnapshot noInjectors(BlockPos corePos, Object core, Object fusionState) {
+        public static FusionStructureSnapshot noInjectors(BlockPos corePos, TileFusionCraftingCore core, Object fusionState) {
             return new FusionStructureSnapshot(true, false, corePos, core, List.of(), fusionState);
         }
 
-        public static FusionStructureSnapshot invalidInjectors(BlockPos corePos, Object core, List<?> injectors, Object fusionState) {
+        public static FusionStructureSnapshot invalidInjectors(BlockPos corePos, TileFusionCraftingCore core, List<IFusionInjector> injectors, Object fusionState) {
             return new FusionStructureSnapshot(true, false, corePos, core, List.copyOf(injectors), fusionState);
         }
 
-        public static FusionStructureSnapshot valid(BlockPos corePos, Object core, List<?> injectors, Object fusionState) {
+        public static FusionStructureSnapshot valid(BlockPos corePos, TileFusionCraftingCore core, List<IFusionInjector> injectors, Object fusionState) {
             return new FusionStructureSnapshot(true, false, corePos, core, List.copyOf(injectors), fusionState);
         }
     }
