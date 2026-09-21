@@ -18,7 +18,7 @@ AE2 addon for automating Draconic Evolution Fusion Crafting through core-only co
 [[dependencies.ae2_draconic_fusion_autocrafter]]
 modId="neoforge"
 type="required"
-versionRange="[21.1.0,)"
+versionRange="[21.1.223,)"
 ordering="NONE"
 side="BOTH"
 
