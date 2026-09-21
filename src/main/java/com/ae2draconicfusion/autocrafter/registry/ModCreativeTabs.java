@@ -21,7 +21,6 @@ public final class ModCreativeTabs {
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.ME_DRACONIC_PATTERN_PROVIDER.get());
                         output.accept(ModItems.ME_DRACONIC_PATTERN_PROVIDER_PANEL.get());
-                        output.accept(ModItems.FUSION_ROUTING_CARD.get());
                     })
                     .build());
 
