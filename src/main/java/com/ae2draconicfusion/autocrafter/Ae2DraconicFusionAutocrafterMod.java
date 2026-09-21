@@ -16,6 +16,9 @@ import org.slf4j.LoggerFactory;
 import appeng.api.AECapabilities;
 import appeng.api.networking.IInWorldGridNodeHost;
 import appeng.api.parts.RegisterPartCapabilitiesEvent;
+import appeng.api.upgrades.Upgrades;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
 /**
@@ -47,6 +50,11 @@ public final class Ae2DraconicFusionAutocrafterMod {
             // Register BlockEntities for Jade/Waila and AE2 visual representation
             AEBaseBlockEntity.registerBlockEntityItem(ModBlocks.ME_DRACONIC_PATTERN_PROVIDER_BE.get(),
                     ModItems.ME_DRACONIC_PATTERN_PROVIDER.get());
+
+            BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse("ae2:capacity_card")).ifPresent(card -> {
+                Upgrades.add(card, ModBlocks.ME_DRACONIC_PATTERN_PROVIDER.get(), 3);
+                Upgrades.add(card, ModItems.ME_DRACONIC_PATTERN_PROVIDER_PANEL.get(), 3);
+            });
         });
     }
 
