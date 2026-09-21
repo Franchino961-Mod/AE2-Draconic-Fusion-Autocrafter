@@ -10,6 +10,10 @@ e questo progetto aderisce a [Semantic Versioning](https://semver.org/spec/v2.0.
 ### Aggiunto
 - **Traduzioni**: Aggiunta la traduzione in italiano (`it_it`).
 - **Ricette**: Aggiunta la ricetta shapeless per riconvertire il Pannello ME Draconic Pattern Provider in un Blocco.
+- **Upgrades**: Aggiunto il supporto per la Capacity Card di AE2 al ME Draconic Pattern Provider, permettendo fino a 36 slot per pattern.
+
+### Risolto
+- **Routing Ricette**: Risolto un problema in cui la quantità di catalizzatori per ricette complesse (come l'Awakened Draconium Block) veniva erroneamente valutata come 1, causando l'inserimento errato degli oggetti rimanenti negli iniettori invece che nel core. Il sistema ora estrae in modo robusto le quantità direttamente da `Ingredient.getItems()` quando necessario.
 
 ### Modificato
 - **Dipendenze**: Aggiunte le dipendenze esplicite per `BrandonsCore` e `DraconicEvolution` al processo di build.

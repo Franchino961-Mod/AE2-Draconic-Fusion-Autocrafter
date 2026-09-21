@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Translations**: Added Italian (`it_it`) translation.
 - **Recipes**: Added shapeless crafting recipe to convert ME Draconic Pattern Provider Panel back to a full Block.
+- **Upgrades**: Added support for the AE2 Capacity Card to the ME Draconic Pattern Provider, allowing up to 36 pattern slots.
+
+### Fixed
+- **Recipe Routing**: Fixed an issue where the catalyst count for complex recipes (like Awakened Draconium Block) was incorrectly resolved as 1, causing remaining catalyst items to be mistakenly placed into injectors. The engine now robustly falls back to extracting counts from `Ingredient.getItems()` when needed.
 
 ### Changed
 - **Dependencies**: Added explicit dependencies for `BrandonsCore` and `DraconicEvolution` to build process.
