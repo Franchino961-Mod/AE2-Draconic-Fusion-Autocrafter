@@ -179,6 +179,13 @@ public final class FusionRoutingService {
             if (catalyst.getCustomIngredient() instanceof StackIngredient stackIngredient) {
                 count = stackIngredient.getCount();
             }
+            if (count == 1) {
+                for (ItemStack stack : catalyst.getItems()) {
+                    if (stack.getCount() > count) {
+                        count = stack.getCount();
+                    }
+                }
+            }
             return new CatalystInfo(catalyst, count);
             
         } catch (Exception e) {
@@ -198,6 +205,13 @@ public final class FusionRoutingService {
         int catCount = 1;
         if (catalyst.getCustomIngredient() instanceof StackIngredient si) {
             catCount = si.getCount();
+        }
+        if (catCount == 1) {
+            for (ItemStack stack : catalyst.getItems()) {
+                if (stack.getCount() > catCount) {
+                    catCount = stack.getCount();
+                }
+            }
         }
         
         boolean foundCatalyst = false;
