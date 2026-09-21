@@ -1,32 +1,18 @@
 package com.ae2draconicfusion.autocrafter.ae2;
 
-import com.ae2draconicfusion.autocrafter.registry.ModItems;
+import com.brandon3055.draconicevolution.blocks.tileentity.TileFusionCraftingCore;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import appeng.api.upgrades.IUpgradeableObject;
-
 import java.util.Optional;
 
 /**
- * Utility class for detecting Fusion Routing Cards on AE2 buses
- * and locating Draconic Evolution Fusion Crafting Cores in the world.
- * Uses class name comparison to avoid a compile-time dependency on DE.
+ * Utility class for locating Draconic Evolution Fusion Crafting Cores in the world.
  */
 public final class FusionBusAccess {
-    private static final String FUSION_CORE_CLASS = "com.brandon3055.draconicevolution.blocks.tileentity.TileFusionCraftingCore";
 
     private FusionBusAccess() {
-    }
-
-    /** Checks whether the given BlockEntity has a Fusion Routing Card upgrade installed. */
-    public static boolean hasFusionRoutingCard(BlockEntity host) {
-        if (!(host instanceof IUpgradeableObject upgradeableObject)) {
-            return false;
-        }
-
-        return upgradeableObject.isUpgradedWith(ModItems.FUSION_ROUTING_CARD.get());
     }
 
     /** Finds a Fusion Crafting Core in any of the six adjacent positions. */
@@ -38,7 +24,7 @@ public final class FusionBusAccess {
         for (var direction : net.minecraft.core.Direction.values()) {
             BlockPos candidatePos = busPos.relative(direction);
             BlockEntity blockEntity = level.getBlockEntity(candidatePos);
-            if (blockEntity != null && FUSION_CORE_CLASS.equals(blockEntity.getClass().getName())) {
+            if (blockEntity instanceof TileFusionCraftingCore) {
                 return Optional.of(candidatePos);
             }
         }
@@ -57,7 +43,7 @@ public final class FusionBusAccess {
                 for (int z = -range; z <= range; z++) {
                     BlockPos candidatePos = originPos.offset(new Vec3i(x, y, z));
                     BlockEntity blockEntity = level.getBlockEntity(candidatePos);
-                    if (blockEntity != null && FUSION_CORE_CLASS.equals(blockEntity.getClass().getName())) {
+                    if (blockEntity instanceof TileFusionCraftingCore) {
                         return Optional.of(candidatePos);
                     }
                 }
