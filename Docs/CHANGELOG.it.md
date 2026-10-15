@@ -5,6 +5,14 @@ Tutte le modifiche rilevanti al mod **AE2 Draconic Fusion Autocrafter** saranno 
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 e questo progetto aderisce a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.7] - 2026-10-15
+
+### Risolto
+- **Autocrafting di Gruppo & Prevenzione Stalli**: Risolto il problema in cui la richiesta di oggetti multipli causava il sovraccarico degli iniettori e lo stallo del crafting. Il provider verifica ora che la struttura sia interamente pronta e libera (`isStructureReadyForCraft`), assicurando che lo slot di output del core dal craft precedente sia vuoto prima di inserire una nuova ricetta.
+- **Interferenza tra Multi-Block Vicini**: Risolto il cross-talk tra molteplici setup di Draconic Fusion posizionati a distanza ravvicinata. I Pattern Provider ora danno priorità assoluta ai core direttamente adiacenti e utilizzano la vera distanza euclidea (`distSqr`) anziché l'ordine di scansione per assi delle coordinate.
+- **Accumulo Catalizzatori Multi-Stack**: Risolto il bug in cui ricette con catalizzatori multipli nel core (come l'Awakened Draconium Block che richiede 4 blocchi) ricevevano solo 1 blocco se gli ingredienti venivano forniti in stack separati. Il sistema accumula ora correttamente il conteggio fino al target richiesto e convoglia eventuali item in eccesso negli iniettori.
+- **Simulazione Stateful del Pattern**: Aggiornata la fase di simulazione del pattern per tracciare in memoria l'occupazione reale di core e iniettori durante tutti gli ingressi della ricetta, garantendo un'erogazione atomica priva di falsi positivi.
+
 ## [0.1.6] - 2026-09-21
 
 ### Aggiunto

@@ -36,6 +36,168 @@ public final class FusionRoutingService {
         this.structureScanner = structureScanner;
     }
 
+    /**
+     * Checks whether the fusion structure is fully idle and ready to receive a new crafting job.
+     * Prevents overfilling injectors and recipe stalls during batch crafting.
+     */
+    public boolean isStructureReadyForCraft(FusionStructureScanner.FusionStructureSnapshot snapshot) {
+        if (snapshot == null || !snapshot.validCore() || snapshot.core() == null || snapshot.coreBusy()) {
+            return false;
+        }
+
+        TileFusionCraftingCore core = snapshot.core();
+        if (core.isCrafting()) {
+            return false;
+        }
+
+        // If the output slot has an item, previous craft finished but has not been extracted yet.
+        // Pushing new items while output is full causes DE's startCraft() to fail, stalling the crafter.
+        if (!core.getOutputStack().isEmpty()) {
+            LOGGER.debug("Core at {} is not ready: output slot occupied with {}", snapshot.corePos(), core.getOutputStack());
+            return false;
+        }
+
+        // Catalyst slot must be empty before starting a new craft
+        if (!core.getCatalystStack().isEmpty()) {
+            LOGGER.debug("Core at {} is not ready: catalyst slot occupied with {}", snapshot.corePos(), core.getCatalystStack());
+            return false;
+        }
+
+        // All connected injectors must be valid and completely empty
+        List<IFusionInjector> injectors = snapshot.injectors();
+        if (injectors == null || injectors.isEmpty()) {
+            LOGGER.debug("Core at {} is not ready: no injectors found", snapshot.corePos());
+            return false;
+        }
+
+        for (IFusionInjector injector : injectors) {
+            if (injector == null || !injector.validate() || !injector.getInjectorStack().isEmpty()) {
+                LOGGER.debug("Core at {} is not ready: injector not empty or invalid", snapshot.corePos());
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Routes an entire pattern's ingredients atomically to the fusion structure.
+     * Uses stateful in-memory tracking during simulation to guarantee that all items fit
+     * before applying any changes to the world.
+     */
+    public FusionRoutingResult routePattern(ServerLevel level, BlockPos corePos,
+            List<ItemStack> patternInputs, int scanRange, boolean simulate, @Nullable CatalystInfo catalystInfo) {
+
+        if (patternInputs == null || patternInputs.isEmpty()) {
+            return FusionRoutingResult.TEMPORARY_FAILURE;
+        }
+
+        FusionStructureScanner.FusionStructureSnapshot snapshot = structureScanner.scan(level, corePos, scanRange);
+        if (snapshot.coreBusy()) {
+            return FusionRoutingResult.TEMPORARY_FAILURE;
+        }
+        if (!snapshot.validCore() || snapshot.injectors().isEmpty()) {
+            return snapshot.validCore() ? FusionRoutingResult.NO_INJECTORS_FOUND : FusionRoutingResult.INVALID_CORE;
+        }
+
+        TileFusionCraftingCore core = snapshot.core();
+        if (core == null || core.isCrafting()) {
+            return FusionRoutingResult.TEMPORARY_FAILURE;
+        }
+
+        List<IFusionInjector> orderedInjectors = orderInjectorsDeterministically(snapshot.corePos(), snapshot.injectors());
+        int injectorCount = orderedInjectors.size();
+
+        // Working in-memory state for catalyst
+        ItemStack currentCatalyst = core.getCatalystStack().copy();
+        int targetCatalystCount = catalystInfo != null ? catalystInfo.count() : 0;
+
+        // Working in-memory state for injectors
+        List<ItemStack> currentInjectorStacks = new ArrayList<>(injectorCount);
+        for (IFusionInjector injector : orderedInjectors) {
+            currentInjectorStacks.add(injector.getInjectorStack().copy());
+        }
+
+        for (ItemStack inputStack : patternInputs) {
+            if (inputStack == null || inputStack.isEmpty()) {
+                continue;
+            }
+
+            ItemStack remaining = inputStack.copy();
+
+            // 1. Process catalyst for the core if matching and needed
+            if (catalystInfo != null && catalystInfo.ingredient().test(remaining)) {
+                int currentCount = currentCatalyst.isEmpty() ? 0 : currentCatalyst.getCount();
+                int needed = Math.max(0, targetCatalystCount - currentCount);
+
+                if (needed > 0) {
+                    if (!currentCatalyst.isEmpty() && !catalystInfo.ingredient().test(currentCatalyst)) {
+                        return FusionRoutingResult.TARGET_SLOTS_OCCUPIED;
+                    }
+
+                    int toTake = Math.min(remaining.getCount(), needed);
+                    if (currentCatalyst.isEmpty()) {
+                        currentCatalyst = remaining.copy();
+                        currentCatalyst.setCount(toTake);
+                    } else {
+                        currentCatalyst.grow(toTake);
+                    }
+                    remaining.shrink(toTake);
+                }
+            }
+
+            // 2. Process remaining items into empty injectors (1 item per injector)
+            if (!remaining.isEmpty()) {
+                for (int i = 0; i < injectorCount; i++) {
+                    if (remaining.isEmpty()) {
+                        break;
+                    }
+                    if (currentInjectorStacks.get(i).isEmpty()) {
+                        ItemStack singleItem = remaining.copy();
+                        singleItem.setCount(1);
+                        currentInjectorStacks.set(i, singleItem);
+                        remaining.shrink(1);
+                    }
+                }
+
+                if (!remaining.isEmpty()) {
+                    // Injectors ran out before placing all items
+                    return FusionRoutingResult.INJECTORS_INSUFFICIENT;
+                }
+            }
+        }
+
+        // Verify that the catalyst count requirement was completely fulfilled
+        if (catalystInfo != null) {
+            int currentCount = currentCatalyst.isEmpty() ? 0 : currentCatalyst.getCount();
+            if (currentCount < targetCatalystCount) {
+                LOGGER.debug("Pattern failed to satisfy catalyst count: expected {} but got {}", targetCatalystCount, currentCount);
+                return FusionRoutingResult.TEMPORARY_FAILURE;
+            }
+        }
+
+        if (simulate) {
+            return FusionRoutingResult.SUCCESS;
+        }
+
+        // EXECUTION: Apply the state atomically to the world
+        try {
+            core.setCatalystStack(currentCatalyst);
+            for (int i = 0; i < injectorCount; i++) {
+                orderedInjectors.get(i).setInjectorStack(currentInjectorStacks.get(i));
+            }
+            return FusionRoutingResult.SUCCESS;
+        } catch (Exception e) {
+            LOGGER.error("Execution error applying fusion pattern delivery: {}", e.getMessage(), e);
+            // Roll back to empty
+            core.setCatalystStack(ItemStack.EMPTY);
+            for (IFusionInjector injector : orderedInjectors) {
+                injector.setInjectorStack(ItemStack.EMPTY);
+            }
+            return FusionRoutingResult.TEMPORARY_FAILURE;
+        }
+    }
+
     public FusionRoutingResult routeItemStackToFusionStructure(ServerLevel level, BlockPos corePos,
             ItemStack sourceStack, int scanRange, boolean simulate, @Nullable CatalystInfo catalystInfo) {
         
@@ -58,29 +220,33 @@ public final class FusionRoutingService {
         // If we have catalyst info and it matches the current item, process it for the core first
         if (catalystInfo != null && catalystInfo.ingredient().test(sourceStack)) {
             ItemStack currentCatalyst = snapshot.core().getCatalystStack();
-            if (!currentCatalyst.isEmpty()) {
-                if (catalystInfo.ingredient().test(currentCatalyst)) {
-                    // Correct catalyst already present
-                    return FusionRoutingResult.SUCCESS;
-                }
-                // Different item in core slot
-                return FusionRoutingResult.TARGET_SLOTS_OCCUPIED;
-            }
+            int currentCount = currentCatalyst.isEmpty() ? 0 : currentCatalyst.getCount();
+            int needed = Math.max(0, catalystInfo.count() - currentCount);
 
-            int toTake = Math.min(sourceStack.getCount(), catalystInfo.count());
-            ItemStack catalystStack = sourceStack.copy();
-            catalystStack.setCount(toTake);
-            
-            if (simulate) {
-                remainingStack.shrink(toTake);
-                if (remainingStack.isEmpty()) {
-                    return FusionRoutingResult.SUCCESS;
+            if (needed > 0) {
+                if (!currentCatalyst.isEmpty() && !catalystInfo.ingredient().test(currentCatalyst)) {
+                    return FusionRoutingResult.TARGET_SLOTS_OCCUPIED;
                 }
-            } else {
-                snapshot.core().setCatalystStack(catalystStack);
-                remainingStack.shrink(toTake);
-                if (remainingStack.isEmpty()) {
-                    return FusionRoutingResult.SUCCESS;
+
+                int toTake = Math.min(remainingStack.getCount(), needed);
+                ItemStack newCatalystStack = currentCatalyst.isEmpty() ? sourceStack.copy() : currentCatalyst.copy();
+                if (currentCatalyst.isEmpty()) {
+                    newCatalystStack.setCount(toTake);
+                } else {
+                    newCatalystStack.grow(toTake);
+                }
+
+                if (simulate) {
+                    remainingStack.shrink(toTake);
+                    if (remainingStack.isEmpty()) {
+                        return FusionRoutingResult.SUCCESS;
+                    }
+                } else {
+                    snapshot.core().setCatalystStack(newCatalystStack);
+                    remainingStack.shrink(toTake);
+                    if (remainingStack.isEmpty()) {
+                        return FusionRoutingResult.SUCCESS;
+                    }
                 }
             }
         }
@@ -214,15 +380,18 @@ public final class FusionRoutingService {
             }
         }
         
-        boolean foundCatalyst = false;
+        int matchedCatalyst = 0;
         for (ItemStack input : availableInputs) {
-            if (catalyst.test(input) && input.getCount() >= catCount) {
-                input.shrink(catCount);
-                foundCatalyst = true;
-                break;
+            if (catalyst.test(input)) {
+                int toTake = Math.min(input.getCount(), catCount - matchedCatalyst);
+                input.shrink(toTake);
+                matchedCatalyst += toTake;
+                if (matchedCatalyst >= catCount) {
+                    break;
+                }
             }
         }
-        if (!foundCatalyst) return false;
+        if (matchedCatalyst < catCount) return false;
         
         // 2. Check remaining ingredients
         for (Ingredient ing : recipe.getIngredients()) {

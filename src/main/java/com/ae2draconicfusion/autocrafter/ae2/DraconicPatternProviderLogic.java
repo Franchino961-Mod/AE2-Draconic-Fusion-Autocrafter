@@ -45,15 +45,15 @@ public final class DraconicPatternProviderLogic extends PatternProviderLogic {
         }
 
         BlockPos providerPos = hostBlockEntity.getBlockPos();
-        BlockPos corePos = FusionBusAccess.resolveFusionCoreInRange(serverLevel, providerPos, DEFAULT_SCAN_RANGE).orElse(null);
+        BlockPos corePos = FusionBusAccess.resolveTargetFusionCore(serverLevel, providerPos, DEFAULT_SCAN_RANGE).orElse(null);
         if (corePos == null) {
             return false;
         }
 
-        // 1. Scan the structure. If it's busy, abort the whole push immediately.
-        // This prevents items from being stuck half-way in.
+        // 1. Scan the structure. If it is busy or not ready (e.g. craft in progress, output slot full,
+        // or injectors occupied), abort the push immediately so AE2 waits and retries cleanly.
         var snapshot = routingService.getStructureScanner().scan(serverLevel, corePos, DEFAULT_SCAN_RANGE);
-        if (!snapshot.validCore() || routingService.isCoreCrafting(snapshot.core())) {
+        if (!routingService.isStructureReadyForCraft(snapshot)) {
             return false;
         }
 
@@ -83,34 +83,20 @@ public final class DraconicPatternProviderLogic extends PatternProviderLogic {
         }
         @Nullable FusionRoutingService.CatalystInfo catalystInfo = resolvePatternCatalyst(serverLevel, stacksToRoute, primaryOutput);
 
-        // 4. SIMULATION: Verify that ALL items would fit
-        // We use a simulation pass to ensure we don't start putting items if we can't finish.
-        for (ItemStack stack : stacksToRoute) {
-            FusionRoutingResult simResult = routingService.routeItemStackToFusionStructure(
-                serverLevel, corePos, stack, DEFAULT_SCAN_RANGE, true, catalystInfo);
-            if (simResult != FusionRoutingResult.SUCCESS) {
-                LOGGER.debug("pushPattern atomic delivery simulated failure: {} for item {}.", simResult, stack);
-                return false;
-            }
+        // 4. SIMULATION: Verify that ALL pattern items fit cleanly into the available core & injectors.
+        FusionRoutingResult simResult = routingService.routePattern(
+            serverLevel, corePos, stacksToRoute, DEFAULT_SCAN_RANGE, true, catalystInfo);
+        if (simResult != FusionRoutingResult.SUCCESS) {
+            LOGGER.debug("pushPattern atomic delivery simulated failure: {} for pattern {}.", simResult, pattern.getDefinition());
+            return false;
         }
 
-        // 5. EXECUTION: Actually place the items.
-        // We track how many have been successfully placed so we can roll back cleanly
-        // if one fails, returning false so AE2 keeps the items in the network.
-        for (int i = 0; i < stacksToRoute.size(); i++) {
-            ItemStack stack = stacksToRoute.get(i);
-            FusionRoutingResult realResult = routingService.routeItemStackToFusionStructure(
-                serverLevel, corePos, stack, DEFAULT_SCAN_RANGE, false, catalystInfo);
-            if (realResult != FusionRoutingResult.SUCCESS) {
-                LOGGER.error(
-                    "Atomic delivery failed at execution phase on item {} of {}! Rolling back {} already-placed items.",
-                    i + 1, stacksToRoute.size(), i);
-                // Roll back all items placed in this session so nothing is voided
-                routingService.rollbackDelivery(serverLevel, corePos, stacksToRoute.subList(0, i),
-                    DEFAULT_SCAN_RANGE, catalystInfo);
-                return false;
-            }
-            LOGGER.debug("Atomic route: {} -> SUCCESS ({}/{})", stack.getItem(), i + 1, stacksToRoute.size());
+        // 5. EXECUTION: Actually place all items atomically into core & injectors.
+        FusionRoutingResult realResult = routingService.routePattern(
+            serverLevel, corePos, stacksToRoute, DEFAULT_SCAN_RANGE, false, catalystInfo);
+        if (realResult != FusionRoutingResult.SUCCESS) {
+            LOGGER.error("Atomic delivery failed at execution phase: {} for pattern {}!", realResult, pattern.getDefinition());
+            return false;
         }
 
         // 6. AUTO-START: All items are in, trigger the craft!

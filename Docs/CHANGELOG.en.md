@@ -5,6 +5,14 @@ All notable changes to the **AE2 Draconic Fusion Autocrafter** mod will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.7] - 2026-10-15
+
+### Fixed
+- **Batch Autocrafting & Stall Prevention**: Resolved an issue where ordering multiple items resulted in ingredients overfilling injectors and stalling the crafting process. The provider now verifies that the structure is completely idle and ready (`isStructureReadyForCraft`), ensuring the core output slot from the previous craft is empty before pushing the next recipe.
+- **Multi-block Structure Cross-talk**: Fixed an issue where multiple Draconic Fusion setups placed close to each other experienced pattern cross-talk. Pattern Providers now strictly prioritize directly adjacent fusion cores, and use true Euclidean distance (`distSqr`) instead of coordinate sweep order when scanning surrounding cores.
+- **Multi-Stack Catalyst Accumulation**: Fixed an issue where recipes requiring multiple items in the core (such as Awakened Draconium Block requiring 4 Wyvern/Draconium blocks) only received 1 block if inputs were passed across multiple stacks. Inputs are now incrementally accumulated into the catalyst slot up to the recipe count, and any excess items correctly overflow into the injectors.
+- **Stateful Pattern Simulation**: Upgraded pattern delivery simulation to track simulated core and injector slots across all pattern inputs in memory, guaranteeing atomic delivery and preventing false-positive simulation passes.
+
 ## [0.1.6] - 2026-09-21
 
 ### Added
