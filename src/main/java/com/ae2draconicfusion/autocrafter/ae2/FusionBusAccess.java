@@ -2,13 +2,13 @@ package com.ae2draconicfusion.autocrafter.ae2;
 
 import com.brandon3055.draconicevolution.blocks.tileentity.TileFusionCraftingCore;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import java.util.Optional;
 
 /**
- * Utility class for locating Draconic Evolution Fusion Crafting Cores in the world.
+ * Utility class for locating Draconic Evolution Fusion Crafting Cores in the
+ * world.
  */
 public final class FusionBusAccess {
 
@@ -32,7 +32,10 @@ public final class FusionBusAccess {
         return Optional.empty();
     }
 
-    /** Finds the nearest Fusion Crafting Core within a cubic range by Euclidean distance. */
+    /**
+     * Finds the nearest Fusion Crafting Core within a cubic range by Euclidean
+     * distance.
+     */
     public static Optional<BlockPos> resolveFusionCoreInRange(ServerLevel level, BlockPos originPos, int range) {
         if (level == null || originPos == null || range < 0) {
             return Optional.empty();
@@ -63,14 +66,16 @@ public final class FusionBusAccess {
     /**
      * Resolves the target Fusion Crafting Core for a Pattern Provider.
      * Strictly prioritizes directly adjacent cores (distance = 1 block) first.
-     * If no adjacent core is found, falls back to finding the closest core within range.
+     * If no adjacent core is found, falls back to finding the closest core within
+     * range.
      */
     public static Optional<BlockPos> resolveTargetFusionCore(ServerLevel level, BlockPos originPos, int range) {
         if (level == null || originPos == null) {
             return Optional.empty();
         }
 
-        // 1. Strictly check directly adjacent blocks first (prevents cross-talk with nearby setups)
+        // 1. Strictly check directly adjacent blocks first (prevents cross-talk with
+        // nearby setups)
         Optional<BlockPos> adjacent = resolveAdjacentFusionCore(level, originPos);
         if (adjacent.isPresent()) {
             return adjacent;
